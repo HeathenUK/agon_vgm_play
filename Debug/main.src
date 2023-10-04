@@ -1,0 +1,7706 @@
+; Zilog eZ80 ANSI C Compiler Release 3.4
+; -nomodsect -optspeed -noreduceopt -nopadbranch -debug
+; -peephole -globalopt -localcse -const=ROM 
+	FILE	"..\main.c"
+	.assume ADL=1
+.DEBUG "C"
+	SEGMENT CODE
+.BEGREC "fmt_type",19
+.DEFINE "status"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "flags"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "size"
+.VALUE 2
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "chr"
+.VALUE 3
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "type"
+.VALUE 4
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "field_width"
+.VALUE 5
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "precision"
+.VALUE 6
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "set_begin"
+.VALUE 7
+.CLASS 8
+.TYPE 34
+.ENDEF
+.DEFINE "set_end"
+.VALUE 10
+.CLASS 8
+.TYPE 34
+.ENDEF
+.DEFINE "pad_whole"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "pad_pre_fract"
+.VALUE 14
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "pad_post_fract"
+.VALUE 15
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "pad_at"
+.VALUE 16
+.CLASS 8
+.TYPE 34
+.ENDEF
+.ENDREC "fmt_type"
+.BEGREC "flt_info",12
+.DEFINE "flags"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "exp"
+.VALUE 1
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "digits"
+.VALUE 2
+.CLASS 8
+.DIM 10
+.TYPE 108
+.ENDEF
+.ENDREC "flt_info"
+.BEGREC "NONAME0",6
+.DEFINE "quot"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "rem"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME0"
+.BEGREC "NONAME1",8
+.DEFINE "quot"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "rem"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME1"
+.BEGREC "header",6
+.DEFINE "s"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME2"
+.TYPE 8
+.ENDEF
+.DEFINE "x"
+.VALUE 0
+.CLASS 11
+.TYPE 2
+.ENDEF
+.ENDREC "header"
+.BEGREC "NONAME2",6
+.DEFINE "ptr"
+.VALUE 0
+.CLASS 8
+.TAG "header"
+.TYPE 40
+.ENDEF
+.DEFINE "size"
+.VALUE 3
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME2"
+.BEGREC "NONAME3",8
+.DEFINE "baudRate"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "dataBits"
+.VALUE 3
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "stopBits"
+.VALUE 4
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "parity"
+.VALUE 5
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "flowcontrol"
+.VALUE 6
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "eir"
+.VALUE 7
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME3"
+.BEGREC "NONAME4",15
+.DEFINE "fs"
+.VALUE 0
+.CLASS 8
+.TYPE 46
+.ENDEF
+.DEFINE "id"
+.VALUE 3
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "attr"
+.VALUE 5
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "stat"
+.VALUE 6
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "sclust"
+.VALUE 7
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "objsize"
+.VALUE 11
+.CLASS 8
+.TYPE 15
+.ENDEF
+.ENDREC "NONAME4"
+.BEGREC "NONAME5",36
+.DEFINE "obj"
+.VALUE 0
+.CLASS 8
+.TAG "NONAME4"
+.TYPE 8
+.ENDEF
+.DEFINE "flag"
+.VALUE 15
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "err"
+.VALUE 16
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "fptr"
+.VALUE 17
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "clust"
+.VALUE 21
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "sect"
+.VALUE 25
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "dir_sect"
+.VALUE 29
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "dir_ptr"
+.VALUE 33
+.CLASS 8
+.TYPE 46
+.ENDEF
+.ENDREC "NONAME5"
+;    1	#include <stdio.h>
+;    2	#include <stdlib.h>
+;    3	#include <ctype.h>
+;    4	#include <stdint.h>
+;    5	#include <string.h>
+;    6	
+;    7	#include <eZ80.h>
+;    8	#include <eZ80F92.h>
+;    9	#include <defines.h>
+;   10	
+;   11	#include "mos-interface.h"
+;   12	#include "vdp.h"
+;   13	#include "agontimer.h"
+;   14	
+;   15	extern void write16bit(UINT16 w);
+;   16	extern void write32bit(UINT32 w);
+;   17	
+;   18	typedef struct {
+;   19	    uint8_t chip_type;
+;   20	    uint8_t chip_variant;
+;   21	    uint32_t clock;
+;   22	    uint8_t n_channels;
+;   23	    uint24_t f_scale;
+;   24	    uint24_t loop_start;
+;   25	
+;   26	    uint8_t header_size;
+;   27	    uint24_t data_start;
+;   28	    uint24_t data_length;
+;   29	
+;   30	    bool loop_enabled;
+;   31	
+;   32	    uint32_t gd3_location;
+;   33	
+;   34	    float volume_multiplier;
+;   35		float stored_multiplier;
+;   36		
+;   37	    bool pause;
+;   38	
+;   39	    char header_data[64];
+;   40		char *song_data;
+;   41	    uint16_t data_pointer;
+;   42	}
+;   43	vgm_info;
+.BEGREC "NONAME6",103
+.DEFINE "chip_type"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "chip_variant"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "clock"
+.VALUE 2
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "n_channels"
+.VALUE 6
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "f_scale"
+.VALUE 7
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "loop_start"
+.VALUE 10
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "header_size"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "data_start"
+.VALUE 14
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "data_length"
+.VALUE 17
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "loop_enabled"
+.VALUE 20
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "gd3_location"
+.VALUE 21
+.CLASS 8
+.TYPE 15
+.ENDEF
+.DEFINE "volume_multiplier"
+.VALUE 25
+.CLASS 8
+.TYPE 6
+.ENDEF
+.DEFINE "stored_multiplier"
+.VALUE 29
+.CLASS 8
+.TYPE 6
+.ENDEF
+.DEFINE "pause"
+.VALUE 33
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "header_data"
+.VALUE 34
+.CLASS 8
+.DIM 64
+.TYPE 98
+.ENDEF
+.DEFINE "song_data"
+.VALUE 98
+.CLASS 8
+.TYPE 34
+.ENDEF
+.DEFINE "data_pointer"
+.VALUE 101
+.CLASS 8
+.TYPE 13
+.ENDEF
+.ENDREC "NONAME6"
+;   44	
+;   45	typedef struct {
+;   46	
+;   47	    uint8_t vgm_file;
+;   48		vgm_info vgm_info;
+;   49		uint8_t state;
+;   50	
+;   51	}
+;   52	game_state;
+.BEGREC "NONAME7",105
+.DEFINE "vgm_file"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "vgm_info"
+.VALUE 1
+.CLASS 8
+.TAG "NONAME6"
+.TYPE 8
+.ENDEF
+.DEFINE "state"
+.VALUE 104
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME7"
+	SEGMENT BSS
+_game:
+	DS	105
+.DEFINE "game"
+.ALIAS "_game"
+.CLASS 83
+.VALUE _game
+.TAG "NONAME7"
+.TYPE 8
+.ENDEF
+;   53	
+;   54	game_state game;
+	SEGMENT CODE
+;   55	
+;   56	void delay_ticks(UINT16 ticks_end) { //16.7ms ticks
+_delay_ticks:
+.DEFINE "_delay_ticks"
+
+.VALUE _delay_ticks
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "delay_ticks",56,"_delay_ticks"
+
+.LINE 56
+
+.DEFINE "ticks_end"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 13
+
+.ENDEF
+
+.DEFINE "ticks"
+
+.CLASS 65
+
+.VALUE -4
+
+.TYPE 15
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	DEC	SP
+;   57		
+;   58		UINT32 ticks = 0;
+.LINE 58
+
+	LD	BC,0
+	XOR	A,A
+	LD	(IX+%FFFFFFFC),BC
+	LD	(IX+%FFFFFFFF),A
+;   59		ticks_end *= 6;
+.LINE 59
+
+	LD.LIS	HL,6
+	LD	BC,(IX+%6)
+	CALL	__smulu
+	LD	(IX+%6),L
+	LD	(IX+%7),H
+;   60		while(true) {
+L_3:
+.LINE 60
+
+;   61			
+;   62			waitvblank();
+.LINE 62
+
+	CALL	_waitvblank
+;   63			ticks++;
+.LINE 63
+
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	LD	A,%1
+	CALL	__ladd_b
+	LD	(IX+%FFFFFFFC),HL
+	LD	(IX+%FFFFFFFF),E
+;   64			if(ticks >= ticks_end) break;
+.LINE 64
+
+	LD	BC,(IX+%6)
+	CALL	__stoiu
+	LD	BC,HL
+	XOR	A,A
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	CALL	__lcmpu
+	JR	C,L_3
+;   65			
+;   66		}
+;   67		
+;   68	}
+.LINE 68
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _delay_ticks ***************************
+;Name                         Addr/Register   Size   Type
+;_waitvblank                         IMPORT  -----   function
+;ticks                                 IX-4      4   variable
+;ticks_end                             IX+6      2   parameter
+
+
+; Stack Frame Size: 13 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "delay_ticks",68,"_delay_ticks"
+;   69	
+;   70	void delay_cents(UINT16 ticks_end) { //100ms ticks
+_delay_cents:
+.DEFINE "_delay_cents"
+
+.VALUE _delay_cents
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "delay_cents",70,"_delay_cents"
+
+.LINE 70
+
+.DEFINE "ticks_end"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 13
+
+.ENDEF
+
+.DEFINE "ticks"
+
+.CLASS 65
+
+.VALUE -4
+
+.TYPE 15
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	DEC	SP
+;   71		
+;   72		UINT32 ticks = 0;
+.LINE 72
+
+	LD	BC,0
+	XOR	A,A
+	LD	(IX+%FFFFFFFC),BC
+	LD	(IX+%FFFFFFFF),A
+;   73		ticks_end *= 6;
+.LINE 73
+
+	LD.LIS	HL,6
+	LD	BC,(IX+%6)
+	CALL	__smulu
+	LD	(IX+%6),L
+	LD	(IX+%7),H
+;   74		while(true) {
+L_8:
+.LINE 74
+
+;   75			
+;   76			waitvblank();
+.LINE 76
+
+	CALL	_waitvblank
+;   77			ticks++;
+.LINE 77
+
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	LD	A,%1
+	CALL	__ladd_b
+	LD	(IX+%FFFFFFFC),HL
+	LD	(IX+%FFFFFFFF),E
+;   78			if(ticks >= ticks_end) break;
+.LINE 78
+
+	LD	BC,(IX+%6)
+	CALL	__stoiu
+	LD	BC,HL
+	XOR	A,A
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	CALL	__lcmpu
+	JR	C,L_8
+;   79			
+;   80		}
+;   81		
+;   82	}
+.LINE 82
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _delay_cents ***************************
+;Name                         Addr/Register   Size   Type
+;_waitvblank                         IMPORT  -----   function
+;ticks                                 IX-4      4   variable
+;ticks_end                             IX+6      2   parameter
+
+
+; Stack Frame Size: 13 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "delay_cents",82,"_delay_cents"
+;   83	
+;   84	void delay_secs(UINT16 ticks_end) { //1 sec ticks
+_delay_secs:
+.DEFINE "_delay_secs"
+
+.VALUE _delay_secs
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "delay_secs",84,"_delay_secs"
+
+.LINE 84
+
+.DEFINE "ticks_end"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 13
+
+.ENDEF
+
+.DEFINE "ticks"
+
+.CLASS 65
+
+.VALUE -4
+
+.TYPE 15
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	DEC	SP
+;   85		
+;   86		UINT32 ticks = 0;
+.LINE 86
+
+	LD	BC,0
+	XOR	A,A
+	LD	(IX+%FFFFFFFC),BC
+	LD	(IX+%FFFFFFFF),A
+;   87		ticks_end *= 60;
+.LINE 87
+
+	LD.LIS	HL,60
+	LD	BC,(IX+%6)
+	CALL	__smulu
+	LD	(IX+%6),L
+	LD	(IX+%7),H
+;   88		while(true) {
+L_13:
+.LINE 88
+
+;   89			
+;   90			waitvblank();
+.LINE 90
+
+	CALL	_waitvblank
+;   91			ticks++;
+.LINE 91
+
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	LD	A,%1
+	CALL	__ladd_b
+	LD	(IX+%FFFFFFFC),HL
+	LD	(IX+%FFFFFFFF),E
+;   92			if(ticks >= ticks_end) break;
+.LINE 92
+
+	LD	BC,(IX+%6)
+	CALL	__stoiu
+	LD	BC,HL
+	XOR	A,A
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	CALL	__lcmpu
+	JR	C,L_13
+;   93			
+;   94		}
+;   95		
+;   96	}
+.LINE 96
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _delay_secs ***************************
+;Name                         Addr/Register   Size   Type
+;_waitvblank                         IMPORT  -----   function
+;ticks                                 IX-4      4   variable
+;ticks_end                             IX+6      2   parameter
+
+
+; Stack Frame Size: 13 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "delay_secs",96,"_delay_secs"
+;   97	
+;   98	bool isKthBitSet(uint8_t data, uint8_t k) {
+_isKthBitSet:
+.DEFINE "_isKthBitSet"
+
+.VALUE _isKthBitSet
+
+.CLASS 2
+
+.TYPE 76
+
+.ENDEF
+
+.BEGFUNC "isKthBitSet",98,"_isKthBitSet"
+
+.LINE 98
+
+.DEFINE "data"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "k"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;   99	    return (data & (1 << k)) != 0;
+.LINE 99
+
+	LD	A,(IX+%9)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,1
+	CALL	__ishl
+	LD	A,L
+	AND	A,(IX+%6)
+	JR	Z,L__7
+	LD	A,%1
+	JR	L__8
+L__7:
+	XOR	A,A
+L__8:
+;  100	}
+.LINE 100
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _isKthBitSet ***************************
+;Name                         Addr/Register   Size   Type
+;k                                     IX+9      1   parameter
+;data                                  IX+6      1   parameter
+
+
+; Stack Frame Size: 12 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "isKthBitSet",100,"_isKthBitSet"
+;  101	
+;  102	void channel_ready(int channel) {
+_channel_ready:
+.DEFINE "_channel_ready"
+
+.VALUE _channel_ready
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "channel_ready",102,"_channel_ready"
+
+.LINE 102
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  103	
+;  104		waitvblank();
+.LINE 104
+
+	CALL	_waitvblank
+;  105		while (isKthBitSet(getsysvar_audioSuccess(), channel)) continue;
+L_17:
+.LINE 105
+
+	LD	C,(IX+%6)
+	LD	B,%0
+	PUSH	BC
+	CALL	_getsysvar_audioSuccess
+	LD	C,A
+	LD	B,%0
+	PUSH	BC
+	CALL	_isKthBitSet
+	POP	BC
+	POP	BC
+	OR	A,A
+	JR	NZ,L_17
+;  106			//if () break;
+;  107		
+;  108		
+;  109	}
+.LINE 109
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _channel_ready ***************************
+;Name                         Addr/Register   Size   Type
+;_getsysvar_audioSuccess             IMPORT  -----   function
+;_waitvblank                         IMPORT  -----   function
+;channel                               IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "channel_ready",109,"_channel_ready"
+;  110	
+;  111	#define change_volume(channel, volume) \
+;  112	    do { \
+;  113	        putch(23); \
+;  114	        putch(0); \
+;  115	        putch(133); \
+;  116	        putch((channel)); \
+;  117	        putch(2); \
+;  118	        putch((volume)); \
+;  119	    } while (0)
+;  120		
+;  121	
+;  122	/* void change_frequency(UINT8 channel, UINT16 frequency) {
+;  123		
+;  124		putch(23);
+;  125		putch(0);
+;  126		putch(133);
+;  127		
+;  128		putch(channel);
+;  129		putch(101); //Non envelope but custom waveform
+;  130		write16bit(frequency);
+;  131		
+;  132	} */
+;  133	
+;  134	#define change_frequency(channel, frequency) \
+;  135	    do { \
+;  136	        putch(23); \
+;  137	        putch(0); \
+;  138	        putch(133); \
+;  139	        putch((channel)); \
+;  140	        putch(3); \
+;  141	        write16bit((frequency)); \
+;  142	    } while (0)
+;  143	
+;  144	
+;  145	void play_simple(int channel, int vol, int duration, int frequency) {
+_play_simple:
+.DEFINE "_play_simple"
+
+.VALUE _play_simple
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "play_simple",145,"_play_simple"
+
+.LINE 145
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "vol"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "duration"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "frequency"
+
+.CLASS 65
+
+.VALUE 15
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  146		
+;  147		
+;  148		putch(23);
+.LINE 148
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  149		putch(0);
+.LINE 149
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  150		putch(133);
+.LINE 150
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  151		
+;  152		putch(channel);
+.LINE 152
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  153		putch(0);
+.LINE 153
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  154		putch(vol);
+.LINE 154
+
+	LD	BC,(IX+%9)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  155		
+;  156		write16bit(frequency);
+.LINE 156
+
+	LD	BC,(IX+%F)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  157		write16bit(duration);
+.LINE 157
+
+	LD	BC,(IX+%C)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  158		
+;  159	}
+.LINE 159
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _play_simple ***************************
+;Name                         Addr/Register   Size   Type
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;frequency                            IX+15      3   parameter
+;duration                             IX+12      3   parameter
+;vol                                   IX+9      3   parameter
+;channel                               IX+6      3   parameter
+
+
+; Stack Frame Size: 18 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "play_simple",159,"_play_simple"
+;  160	
+;  161	void reset_channel(uint8_t channel) {
+_reset_channel:
+.DEFINE "_reset_channel"
+
+.VALUE _reset_channel
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "reset_channel",161,"_reset_channel"
+
+.LINE 161
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  162		
+;  163		
+;  164		putch(23);
+.LINE 164
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  165		putch(0);
+.LINE 165
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  166		putch(133);
+.LINE 166
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  167		
+;  168		putch(channel);
+.LINE 168
+
+	LD	A,(IX+%6)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+;  169		putch(10); //Non envelope but custom waveform
+.LINE 169
+
+	LD	BC,10
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  170		
+;  171	}
+.LINE 171
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _reset_channel ***************************
+;Name                         Addr/Register   Size   Type
+;_putch                              IMPORT  -----   function
+;channel                               IX+6      1   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "reset_channel",171,"_reset_channel"
+;  172	
+;  173	void play_simple_force(int channel, int wavetype, int vol, int frequency) {
+_play_simple_force:
+.DEFINE "_play_simple_force"
+
+.VALUE _play_simple_force
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "play_simple_force",173,"_play_simple_force"
+
+.LINE 173
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "wavetype"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "vol"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "frequency"
+
+.CLASS 65
+
+.VALUE 15
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  174		
+;  175		putch(23);
+.LINE 175
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  176		putch(0);
+.LINE 176
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  177		putch(133);
+.LINE 177
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  178		
+;  179		putch(channel);
+.LINE 179
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  180		putch(4); //Non envelope but custom waveform
+.LINE 180
+
+	LD	BC,4
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  181		putch(wavetype);
+.LINE 181
+
+	LD	BC,(IX+%9)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  182		putch(vol);
+.LINE 182
+
+	LD	BC,(IX+%C)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  183		
+;  184		write16bit(frequency);
+.LINE 184
+
+	LD	BC,(IX+%F)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  185		write16bit(0);
+.LINE 185
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  186		
+;  187	}
+.LINE 187
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _play_simple_force ***************************
+;Name                         Addr/Register   Size   Type
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;frequency                            IX+15      3   parameter
+;vol                                  IX+12      3   parameter
+;wavetype                              IX+9      3   parameter
+;channel                               IX+6      3   parameter
+
+
+; Stack Frame Size: 18 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "play_simple_force",187,"_play_simple_force"
+;  188	
+;  189	void play_saw_force(int channel, int vol, int frequency) {
+_play_saw_force:
+.DEFINE "_play_saw_force"
+
+.VALUE _play_saw_force
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "play_saw_force",189,"_play_saw_force"
+
+.LINE 189
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "vol"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "frequency"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  190		
+;  191		putch(23);
+.LINE 191
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  192		putch(0);
+.LINE 192
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  193		putch(133);
+.LINE 193
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  194		
+;  195		putch(channel);
+.LINE 195
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  196		putch(3); //Simple, play forever
+.LINE 196
+
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  197		putch(vol);
+.LINE 197
+
+	LD	BC,(IX+%9)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  198		
+;  199		write16bit(frequency);
+.LINE 199
+
+	LD	BC,(IX+%C)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  200		write16bit(2000);
+.LINE 200
+
+	LD	BC,2000
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  201		
+;  202	}
+.LINE 202
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _play_saw_force ***************************
+;Name                         Addr/Register   Size   Type
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;frequency                            IX+12      3   parameter
+;vol                                   IX+9      3   parameter
+;channel                               IX+6      3   parameter
+
+
+; Stack Frame Size: 15 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "play_saw_force",202,"_play_saw_force"
+;  203	
+;  204	void play_advanced(int channel, int  attack, int decay, int sustain, int release, int wavetype, int peakvol, int duration, int frequency, int freq_end, int end_style) {
+_play_advanced:
+.DEFINE "_play_advanced"
+
+.VALUE _play_advanced
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "play_advanced",204,"_play_advanced"
+
+.LINE 204
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "attack"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "decay"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "sustain"
+
+.CLASS 65
+
+.VALUE 15
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "release"
+
+.CLASS 65
+
+.VALUE 18
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "wavetype"
+
+.CLASS 65
+
+.VALUE 21
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "peakvol"
+
+.CLASS 65
+
+.VALUE 24
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "duration"
+
+.CLASS 65
+
+.VALUE 27
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "frequency"
+
+.CLASS 65
+
+.VALUE 30
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "freq_end"
+
+.CLASS 65
+
+.VALUE 33
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "end_style"
+
+.CLASS 65
+
+.VALUE 36
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  205		
+;  206		channel_ready(channel);
+.LINE 206
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_channel_ready
+	POP	BC
+;  207		
+;  208		putch(23);
+.LINE 208
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  209		putch(0);
+.LINE 209
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  210		putch(133);
+.LINE 210
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  211		
+;  212		putch(channel);
+.LINE 212
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  213		putch(2);
+.LINE 213
+
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  214		putch(wavetype);
+.LINE 214
+
+	LD	BC,(IX+%15)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  215		putch(peakvol);
+.LINE 215
+
+	LD	BC,(IX+%18)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  216	
+;  217		write16bit(frequency);
+.LINE 217
+
+	LD	BC,(IX+%1E)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  218		write16bit(duration);
+.LINE 218
+
+	LD	BC,(IX+%1B)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  219		write16bit(attack);
+.LINE 219
+
+	LD	BC,(IX+%9)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  220		putch(sustain);
+.LINE 220
+
+	LD	BC,(IX+%F)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  221		write16bit(decay);
+.LINE 221
+
+	LD	BC,(IX+%C)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  222		write16bit(release);
+.LINE 222
+
+	LD	BC,(IX+%12)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  223		write16bit(freq_end);
+.LINE 223
+
+	LD	BC,(IX+%21)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  224		putch(end_style);
+.LINE 224
+
+	LD	BC,(IX+%24)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  225			
+;  226	}
+.LINE 226
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _play_advanced ***************************
+;Name                         Addr/Register   Size   Type
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;end_style                            IX+36      3   parameter
+;freq_end                             IX+33      3   parameter
+;frequency                            IX+30      3   parameter
+;duration                             IX+27      3   parameter
+;peakvol                              IX+24      3   parameter
+;wavetype                             IX+21      3   parameter
+;release                              IX+18      3   parameter
+;sustain                              IX+15      3   parameter
+;decay                                IX+12      3   parameter
+;attack                                IX+9      3   parameter
+;channel                               IX+6      3   parameter
+
+
+; Stack Frame Size: 39 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "play_advanced",226,"_play_advanced"
+;  227	
+;  228	void play_advanced_keep(int channel, int peakvol, int duration, int frequency) {
+_play_advanced_keep:
+.DEFINE "_play_advanced_keep"
+
+.VALUE _play_advanced_keep
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "play_advanced_keep",228,"_play_advanced_keep"
+
+.LINE 228
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "peakvol"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "duration"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "frequency"
+
+.CLASS 65
+
+.VALUE 15
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  229		
+;  230		channel_ready(channel);
+.LINE 230
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_channel_ready
+	POP	BC
+;  231		
+;  232		putch(23);
+.LINE 232
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  233		putch(0);
+.LINE 233
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  234		putch(133);
+.LINE 234
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  235		
+;  236		putch(channel);
+.LINE 236
+
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  237		putch(6);
+.LINE 237
+
+	LD	BC,6
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  238		
+;  239		putch(peakvol);
+.LINE 239
+
+	LD	BC,(IX+%9)
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  240		write16bit(frequency);
+.LINE 240
+
+	LD	BC,(IX+%F)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  241		write16bit(duration);
+.LINE 241
+
+	LD	BC,(IX+%C)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  242			
+;  243	}
+.LINE 243
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _play_advanced_keep ***************************
+;Name                         Addr/Register   Size   Type
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;frequency                            IX+15      3   parameter
+;duration                             IX+12      3   parameter
+;peakvol                               IX+9      3   parameter
+;channel                               IX+6      3   parameter
+
+
+; Stack Frame Size: 18 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "play_advanced_keep",243,"_play_advanced_keep"
+;  244	
+;  245	void play_sample(UINT8 channel, UINT8 sample_id, UINT8 volume) {
+_play_sample:
+.DEFINE "_play_sample"
+
+.VALUE _play_sample
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "play_sample",245,"_play_sample"
+
+.LINE 245
+
+.DEFINE "channel"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "sample_id"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "volume"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;  246		
+;  247		channel_ready(channel);
+.LINE 247
+
+	LD	A,(IX+%6)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_channel_ready
+	POP	BC
+;  248		
+;  249		putch(23);
+.LINE 249
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  250		putch(0);
+.LINE 250
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  251		putch(133);
+.LINE 251
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  252		
+;  253		putch(channel);
+.LINE 253
+
+	LD	A,(IX+%6)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+;  254		putch(5);
+.LINE 254
+
+	LD	BC,5
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  255		putch(sample_id);
+.LINE 255
+
+	LD	A,(IX+%9)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+;  256		putch(1); //Playback mode
+.LINE 256
+
+	LD	BC,1
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  257		
+;  258		putch(volume);
+.LINE 258
+
+	LD	A,(IX+%C)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+;  259		
+;  260	}
+.LINE 260
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _play_sample ***************************
+;Name                         Addr/Register   Size   Type
+;_putch                              IMPORT  -----   function
+;volume                               IX+12      1   parameter
+;sample_id                             IX+9      1   parameter
+;channel                               IX+6      1   parameter
+
+
+; Stack Frame Size: 15 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "play_sample",260,"_play_sample"
+;  261	
+;  262	void load_wav(const char* filename, uint8_t sample_id) {
+_load_wav:
+.DEFINE "_load_wav"
+
+.VALUE _load_wav
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "load_wav",262,"_load_wav"
+
+.LINE 262
+
+.DEFINE "filename"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 194
+
+.ENDEF
+
+.DEFINE "sample_id"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "fp"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -4
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "data_size"
+
+.CLASS 65
+
+.VALUE -11
+
+.TYPE 15
+
+.ENDEF
+
+.DEFINE "sample_buffer"
+
+.CLASS 65
+
+.VALUE -14
+
+.TYPE 34
+
+.ENDEF
+
+.DEFINE "sample_rate"
+
+.CLASS 65
+
+.VALUE -18
+
+.TYPE 15
+
+.ENDEF
+
+.DEFINE "header"
+
+.CLASS 65
+
+.VALUE -318
+
+.DIM 300
+
+.TYPE 108
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LD	HL,-384
+	ADD	HL,SP
+	LD	SP,HL
+;  263	    
+;  264		int i, j, header_size, bit_rate;
+;  265		int8_t sample8;
+;  266		int16_t sample16;
+;  267		uint32_t data_size, sample_rate;
+;  268	    unsigned char header[300];
+;  269		UINT32 remainder;
+;  270		char *sample_buffer;
+;  271	    UINT8 fp;
+;  272		FIL *fo;
+;  273		
+;  274	    fp = mos_fopen(filename, fa_read);
+.LINE 274
+
+	LD	BC,1
+	PUSH	BC
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	_mos_fopen
+	POP	BC
+	POP	BC
+	LD	(IX+%FFFFFFFF),A
+;  275	    if (!fp) {
+.LINE 275
+
+	OR	A,A
+	JR	NZ,L_37
+;  276	        printf("Error: could not open file %s\n", filename);
+.LINE 276
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__20
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	BC,(IX+%6)
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	BC,10
+	PUSH	BC
+	CALL	___print_uputch
+	POP	BC
+;  277	        return;
+.LINE 277
+
+	JR	L_65
+;  278	    }
+L_37:
+.LINE 278
+
+;  279	
+;  280	    for (i = 0; i < 300 && !mos_feof(fp); i++) {
+.LINE 280
+
+	LD	BC,0
+	LD	(IX+%FFFFFFFC),BC
+	JR	L_36
+L_34:
+;  281	        header[i] = mos_fgetc(fp);
+.LINE 281
+
+	LD	BC,(IX+%FFFFFFFC)
+	LD	HL,IX
+	LD	DE,-318
+	ADD	HL,DE
+	ADD	HL,BC
+	LD	(IX+%FFFFFFF9),HL
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fgetc
+	POP	BC
+	LD	HL,(IX+%FFFFFFF9)
+	LD	(HL),A
+;  282	        if (i >= 3 && header[i - 7] == 'd' && header[i - 6] == 'a' && header[i - 5] == 't' && header[i - 4] == 'a') {
+.LINE 282
+
+	LD	BC,3
+	LD	HL,(IX+%FFFFFFFC)
+	OR	A,A
+	SBC	HL,BC
+	JP	M,L_35
+	LD	IY,(IX+%FFFFFFF9)
+	LEA	HL,IY+%FFFFFFF9
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,100
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_35
+	LD	IY,(IX+%FFFFFFF9)
+	LEA	HL,IY+%FFFFFFFA
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,97
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_35
+	LD	IY,(IX+%FFFFFFF9)
+	LEA	HL,IY+%FFFFFFFB
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,116
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_35
+	LD	IY,(IX+%FFFFFFF9)
+	LEA	HL,IY+%FFFFFFFC
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,97
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_59
+;  283				break; // found the start of the data
+;  284	        }
+;  285	    }
+L_35:
+.LINE 285
+
+	LD	BC,(IX+%FFFFFFFC)
+	INC	BC
+	LD	(IX+%FFFFFFFC),BC
+L_36:
+	LD	BC,300
+	LD	HL,(IX+%FFFFFFFC)
+	OR	A,A
+	SBC	HL,BC
+	JP	P,L__54
+	JP	PE,L_59
+	JR	L__55
+L__54:
+	JP	PO,L_59
+L__55:
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_feof
+	POP	BC
+	OR	A,A
+	JR	Z,L_34
+L_59:
+;  286	
+;  287	    if (i >= 300 || !(header[0] == 'R' && header[1] == 'I' && header[2] == 'F' && header[3] == 'F') ||
+.LINE 287
+
+	LD	BC,300
+	LD	HL,(IX+%FFFFFFFC)
+	OR	A,A
+	SBC	HL,BC
+	JP	P,L_58
+	LD	HL,-318
+	LD	BC,IX
+	ADD	HL,BC
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,82
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	HL,IX
+	LD	BC,-318
+	ADD	HL,BC
+	INC	HL
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,73
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%2
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,70
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%3
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,70
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+;  288	        !(header[8] == 'W' && header[9] == 'A' && header[10] == 'V' && header[11] == 'E' &&
+.LINE 288
+
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%8
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,87
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%9
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,65
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%A
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,86
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%B
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,69
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+;  289	          header[12] == 'f' && header[13] == 'm' && header[14] == 't' && header[15] == ' ') ||
+.LINE 289
+
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%C
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,102
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%D
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,109
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%E
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,116
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%F
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,32
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+;  290	        !(header[16] == 0x10 && header[17] == 0x00 && header[18] == 0x00 && header[19] == 0x00 &&
+.LINE 290
+
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%10
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,16
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LD	A,(IY+%11)
+	OR	A,A
+	JR	NZ,L_58
+	LD	IY,IX
+	ADD	IY,BC
+	LD	A,(IY+%12)
+	OR	A,A
+	JR	NZ,L_58
+	LD	IY,IX
+	ADD	IY,BC
+	LD	A,(IY+%13)
+	OR	A,A
+	JR	NZ,L_58
+;  291	          header[20] == 0x01 && header[21] == 0x00 && header[22] == 0x01 && header[23] == 0x00)) {
+.LINE 291
+
+	LD	IY,IX
+	ADD	IY,BC
+	LEA	HL,IY+%14
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,1
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LD	A,(IY+%15)
+	OR	A,A
+	JR	NZ,L_58
+	LD	IY,IX
+	ADD	IY,BC
+	LEA	HL,IY+%16
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,1
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_58
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LD	A,(IY+%17)
+	OR	A,A
+	JR	Z,L_60
+L_58:
+;  292	        printf("Error: invalid WAV file\n");
+.LINE 292
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__49
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+;  293	        mos_fclose(fp);
+.LINE 293
+
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fclose
+	POP	BC
+;  294	        return;
+.LINE 294
+
+	JR	L_65
+;  295	    }
+L_60:
+.LINE 295
+
+;  296		
+;  297	    sample_rate = header[24] | (header[25] << 8) | (header[26] << 16) | (header[27] << 24);
+.LINE 297
+
+	LD	IY,IX
+	ADD	IY,BC
+	UEXT	HL
+	LD	L,(IY+%18)
+	LD	BC,HL
+	PUSH	BC
+	PUSH	HL
+	LD	HL,BC
+	LD	BC,-327	; spill
+	CALL	__istix
+	POP	HL
+	POP	BC
+	LD	E,H
+	LD	IY,IX
+	LD	HL,BC
+	LD	BC,-330	; spill
+	CALL	__istix
+	LD	BC,-318
+	LD	HL,BC	; unspill
+	LD	BC,-333	; spill
+	CALL	__istix
+	LD	BC,-330	; unspill
+	CALL	__ildix
+	LD	BC,-333	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	ADD	IY,BC
+	UEXT	HL
+	LD	L,(IY+%19)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	BC
+	POP	HL
+	PUSH	BC
+	LD	IY,-335	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	POP	BC
+	INC	SP
+	LD	HL,BC
+	LD	BC,-324	; spill
+	CALL	__istix
+	LD	BC,-327	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	LD	HL,BC
+	LD	BC,-324	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	PUSH	BC
+	LD	IY,-334	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	IY,-335	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	LD	A,L
+	PUSH	BC
+	LD	IY,-334	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	CALL	__lor
+	LD	BC,HL
+	PUSH	BC
+	LD	HL,BC
+	LD	BC,-338	; spill
+	CALL	__istix
+	POP	BC
+	LD	IY,IX
+	LD	HL,BC
+	LD	BC,-341	; spill
+	CALL	__istix
+	LD	BC,-318
+	LD	HL,BC	; unspill
+	LD	BC,-344	; spill
+	CALL	__istix
+	LD	BC,-341	; unspill
+	CALL	__ildix
+	LD	BC,-344	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	ADD	IY,BC
+	UEXT	HL
+	LD	L,(IY+%1A)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	POP	BC
+	POP	HL
+	PUSH	BC
+	LD	IY,-345	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	POP	BC
+	INC	SP
+	INC	SP
+	LD	HL,BC
+	LD	BC,-324	; spill
+	CALL	__istix
+	LD	BC,-338	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	LD	HL,BC
+	LD	BC,-324	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	PUSH	BC
+	LD	IY,-334	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	IY,-345	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	LD	A,L
+	PUSH	BC
+	LD	IY,-334	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	CALL	__lor
+	LD	BC,HL
+	PUSH	BC
+	LD	HL,BC
+	LD	BC,-348	; spill
+	CALL	__istix
+	POP	BC
+	LD	IY,IX
+	LD	HL,BC
+	LD	BC,-351	; spill
+	CALL	__istix
+	LD	BC,-318
+	LD	HL,BC	; unspill
+	LD	BC,-354	; spill
+	CALL	__istix
+	LD	BC,-351	; unspill
+	CALL	__ildix
+	LD	BC,-354	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	ADD	IY,BC
+	LD	L,(IY+%1B)
+	LD	IY,-355	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	BC,0
+	LD	HL,BC
+	LD	BC,-324	; spill
+	CALL	__istix
+	LD	BC,-348	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	LD	HL,BC
+	LD	BC,-324	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	PUSH	BC
+	LD	IY,-334	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	IY,-355	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	LD	A,L
+	PUSH	BC
+	LD	IY,-334	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	CALL	__lor
+	LD	(IX+%FFFFFFEE),HL
+	LD	(IX+%FFFFFFF1),E
+;  298		data_size = header[i - 3] | (header[i - 2] << 8) | (header[i - 1] << 16) | (header[i] << 24);
+.LINE 298
+
+	LD	BC,(IX+%FFFFFFFC)
+	LD	HL,IX
+	LD	DE,-318
+	ADD	HL,DE
+	ADD	HL,BC
+	LD	IY,-321
+	LD	BC,IX
+	ADD	IY,BC
+	LD	(IY),HL
+	LD	HL,-321
+	LD	BC,IX
+	ADD	HL,BC
+	LD	IY,(HL)
+	UEXT	HL
+	LD	L,(IY+%FFFFFFFE)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	BC
+	PUSH	BC
+	LD	HL,BC
+	LD	BC,-358	; spill
+	CALL	__istix
+	POP	BC
+	POP	DE
+	INC	SP
+	LD	HL,-321
+	PUSH	HL
+	LD	HL,BC
+	LD	BC,-361	; spill
+	CALL	__istix
+	POP	HL
+	LD	BC,IX
+	PUSH	HL
+	LD	HL,BC	; unspill
+	LD	BC,-364	; spill
+	CALL	__istix
+	POP	HL
+	LD	BC,-361	; unspill
+	PUSH	HL
+	CALL	__ildix
+	POP	HL
+	LD	BC,-364	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	ADD	HL,BC
+	LD	IY,(HL)
+	UEXT	HL
+	LD	L,(IY+%FFFFFFFD)
+	LD	BC,HL
+	LD	A,H
+	LD	HL,BC
+	LD	BC,-324	; spill
+	CALL	__istix
+	LD	BC,-358	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	LD	HL,BC
+	LD	BC,-324	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	CALL	__lor
+	LD	BC,HL
+	PUSH	BC
+	LD	HL,BC
+	LD	BC,-367	; spill
+	CALL	__istix
+	POP	BC
+	LD	HL,-321
+	PUSH	HL
+	LD	HL,BC
+	LD	BC,-370	; spill
+	CALL	__istix
+	POP	HL
+	LD	BC,IX
+	PUSH	HL
+	LD	HL,BC	; unspill
+	LD	BC,-373	; spill
+	CALL	__istix
+	POP	HL
+	LD	BC,-370	; unspill
+	PUSH	HL
+	CALL	__ildix
+	POP	HL
+	LD	BC,-373	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	ADD	HL,BC
+	LD	IY,(HL)
+	DEC	IY
+	UEXT	HL
+	LD	L,(IY)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	POP	BC
+	POP	HL
+	PUSH	BC
+	LD	IY,-374	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	POP	BC
+	INC	SP
+	INC	SP
+	LD	HL,BC
+	LD	BC,-324	; spill
+	CALL	__istix
+	LD	BC,-367	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	LD	HL,BC
+	LD	BC,-324	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	PUSH	BC
+	LD	IY,-334	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	IY,-374	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	LD	A,L
+	PUSH	BC
+	LD	IY,-334	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	CALL	__lor
+	LD	BC,HL
+	PUSH	BC
+	LD	HL,BC
+	LD	BC,-377	; spill
+	CALL	__istix
+	POP	BC
+	LD	HL,-321
+	PUSH	HL
+	LD	HL,BC
+	LD	BC,-380	; spill
+	CALL	__istix
+	POP	HL
+	LD	BC,IX
+	PUSH	HL
+	LD	HL,BC	; unspill
+	LD	BC,-383	; spill
+	CALL	__istix
+	POP	HL
+	LD	BC,-380	; unspill
+	PUSH	HL
+	CALL	__ildix
+	POP	HL
+	LD	BC,-383	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	ADD	HL,BC
+	LD	IY,(HL)
+	LD	L,(IY)
+	LD	IY,-384	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	BC,0
+	LD	HL,BC
+	LD	BC,-324	; spill
+	CALL	__istix
+	LD	BC,-377	; unspill
+	CALL	__ildix
+	LD	BC,HL
+	LD	HL,BC
+	LD	BC,-324	; unspill
+	PUSH	HL
+	CALL	__ildix
+	LD	BC,HL
+	POP	HL
+	PUSH	BC
+	LD	IY,-334	; spill
+	LD	BC,IX	; spill
+	ADD	IY,BC
+	LD	(IY),L
+	LD	IY,-384	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	LD	A,L
+	PUSH	BC
+	LD	IY,-334	; unspill
+	LD	BC,IX	; unspill
+	ADD	IY,BC
+	LD	L,(IY)
+	POP	BC
+	CALL	__lor
+	LD	(IX+%FFFFFFF5),HL
+	LD	(IX+%FFFFFFF8),E
+;  299	
+;  300	    if (header[34] == 8 && header[35] == 0) {
+.LINE 300
+
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LEA	HL,IY+%22
+	LD	A,(HL)
+	UEXT	HL
+	LD	L,A
+	LD	BC,8
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_63
+	LD	IY,IX
+	LD	BC,-318
+	ADD	IY,BC
+	LD	A,(IY+%23)
+	OR	A,A
+	JR	Z,L_64
+;  301	        bit_rate = 8;
+;  302	    } else {
+.LINE 302
+
+L_63:
+;  303	        printf("Error: unsupported PCM format\n");
+.LINE 303
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__52
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+;  304	        mos_fclose(fp);
+.LINE 304
+
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fclose
+	POP	BC
+;  305	        return;
+.LINE 305
+
+	JR	L_65
+;  306	    }
+L_64:
+.LINE 306
+
+;  307		
+;  308			//remainder = data_size % 5000;	
+;  309			printf("%u total samples.\r\n", data_size);
+.LINE 309
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	A,%75
+	LD	(___print_fmt+4),A
+	LD	C,(IX+%FFFFFFF8)
+	LD	B,%0
+	PUSH	BC
+	LD	BC,(IX+%FFFFFFF5)
+	PUSH	BC
+	CALL	__u_uitoa
+	POP	BC
+	POP	BC
+	LD	BC,L__53
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+;  310	
+;  311			//printf("Done reading.\r\n");
+;  312			putch(23);
+.LINE 312
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  313			putch(0);
+.LINE 313
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  314			putch(133);
+.LINE 314
+
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  315			putch(0);
+.LINE 315
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  316			putch(5); //Sample mode
+.LINE 316
+
+	LD	BC,5
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  317	
+;  318			putch(sample_id); //Sample ID
+.LINE 318
+
+	LD	A,(IX+%9)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+;  319			putch(0); //Record mode
+.LINE 319
+
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  320			
+;  321			write32bit(data_size);
+.LINE 321
+
+	LD	C,(IX+%FFFFFFF8)
+	LD	B,%0
+	PUSH	BC
+	LD	BC,(IX+%FFFFFFF5)
+	PUSH	BC
+	CALL	_write32bit
+	POP	BC
+	POP	BC
+;  322			//else if (bit_rate == 16) write32bit(data_size / 2);
+;  323			
+;  324			write16bit(sample_rate);
+.LINE 324
+
+	LD	BC,(IX+%FFFFFFEE)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+;  325			
+;  326			sample_buffer = (char *) malloc(data_size);
+.LINE 326
+
+	LD	BC,(IX+%FFFFFFF5)
+	PUSH	BC
+	CALL	_malloc
+	POP	BC
+	LD	(IX+%FFFFFFF2),HL
+;  327			mos_fread(fp, sample_buffer, data_size);
+.LINE 327
+
+	LD	BC,(IX+%FFFFFFF5)
+	PUSH	BC
+	LD	BC,(IX+%FFFFFFF2)
+	PUSH	BC
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fread
+	POP	BC
+	POP	BC
+	POP	BC
+;  328			mos_puts(sample_buffer, data_size, 0);
+.LINE 328
+
+	LD	BC,0
+	PUSH	BC
+	LD	BC,(IX+%FFFFFFF5)
+	PUSH	BC
+	LD	BC,(IX+%FFFFFFF2)
+	PUSH	BC
+	CALL	_mos_puts
+	POP	BC
+	POP	BC
+	POP	BC
+;  329			free(sample_buffer);
+.LINE 329
+
+	LD	BC,(IX+%FFFFFFF2)
+	PUSH	BC
+	CALL	_free
+	POP	BC
+;  330	
+;  331	    mos_fclose(fp);
+.LINE 331
+
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fclose
+	POP	BC
+;  332	}
+L_65:
+.LINE 332
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _load_wav ***************************
+;Name                         Addr/Register   Size   Type
+;_free                               IMPORT  -----   function
+;_mos_puts                           IMPORT  -----   function
+;_mos_fread                          IMPORT  -----   function
+;_malloc                             IMPORT  -----   function
+;_write16bit                         IMPORT  -----   function
+;_write32bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;__u_uitoa                           IMPORT  -----   function
+;___print_fmt                        IMPORT     19   variable
+;_mos_fclose                         IMPORT  -----   function
+;_mos_feof                           IMPORT  -----   function
+;_mos_fgetc                          IMPORT  -----   function
+;___print_sendstring                 IMPORT  -----   function
+;___print_xputch                     IMPORT      3   variable
+;___print_uputch                     IMPORT  -----   function
+;_mos_fopen                          IMPORT  -----   function
+;header                              IX-318    300   variable
+;sample_rate                          IX-18      4   variable
+;sample_buffer                        IX-14      3   variable
+;data_size                            IX-11      4   variable
+;G_0                                   IX-7      3   variable
+;i                                     IX-4      3   variable
+;fp                                    IX-1      1   variable
+;sample_id                             IX+9      1   parameter
+;filename                              IX+6      3   parameter
+
+
+; Stack Frame Size: 396 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "load_wav",332,"_load_wav"
+	SEGMENT STRSECT
+L__20:
+	DB	"Error: could not open file "
+	DB	0
+L__49:
+	DB	"Error: invalid WAV file"
+	DB	10,0
+L__52:
+	DB	"Error: unsupported PCM format"
+	DB	10,0
+L__53:
+	DB	" total samples."
+	DB	13,10,0
+	SEGMENT CODE
+;  333	
+;  334	#define AY_3_8910_CLOCK_SPEED 1789773
+;  335	//#define AY_FREQ 55930
+;  336	#define AY_3_8910_CHANNELS 3
+;  337	
+;  338	typedef struct {
+;  339	    uint8_t volume;
+;  340	    uint8_t frequency_coarse;
+;  341	    uint8_t frequency_fine;
+;  342	    int frequency_hz;
+;  343		bool enabled;
+;  344	} ay_channel_state;
+.BEGREC "NONAME8",7
+.DEFINE "volume"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "frequency_coarse"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "frequency_fine"
+.VALUE 2
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "frequency_hz"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "enabled"
+.VALUE 6
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME8"
+	SEGMENT BSS
+_ay_states:
+	DS	21
+.DEFINE "ay_states"
+.ALIAS "_ay_states"
+.CLASS 83
+.VALUE _ay_states
+.DIM 3
+.TAG "NONAME8"
+.TYPE 104
+.ENDEF
+.BEGREC "NONAME9",2
+.DEFINE "latched_channel"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "latched_type"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME9"
+_sn:
+	DS	2
+.DEFINE "sn"
+.ALIAS "_sn"
+.CLASS 83
+.VALUE _sn
+.TAG "NONAME9"
+.TYPE 8
+.ENDEF
+.BEGREC "NONAME10",9
+.DEFINE "volume"
+.VALUE 0
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "frequency_high"
+.VALUE 2
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "frequency_low"
+.VALUE 3
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "frequency_combined"
+.VALUE 4
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "frequency_hz"
+.VALUE 6
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "enabled"
+.VALUE 8
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME10"
+_sn_channels:
+	DS	54
+.DEFINE "sn_channels"
+.ALIAS "_sn_channels"
+.CLASS 83
+.VALUE _sn_channels
+.DIM 6
+.TAG "NONAME10"
+.TYPE 104
+.ENDEF
+	SEGMENT DATA
+_sn_vol_table:
+	DB	127
+	DB	113
+	DB	101
+	DB	90
+	DB	80
+	DB	71
+	DB	63
+	DB	56
+	DB	50
+	DB	45
+	DB	40
+	DB	36
+	DB	32
+	DB	28
+	DB	25
+	DB	0
+.DEFINE "sn_vol_table"
+.ALIAS "_sn_vol_table"
+.CLASS 69
+.VALUE _sn_vol_table
+.DIM 16
+.TYPE 108
+.ENDEF
+;  345	
+;  346	ay_channel_state ay_states[AY_3_8910_CHANNELS];
+;  347	
+;  348	typedef struct {
+;  349		uint8_t latched_channel;
+;  350		uint8_t latched_type;
+;  351	} sn_global;
+;  352	
+;  353	sn_global sn;
+;  354	
+;  355	typedef struct {
+;  356	    // uint8_t volume_high;
+;  357		// uint8_t volume_low;
+;  358		uint16_t volume;
+;  359	    uint8_t frequency_high;
+;  360	    uint8_t frequency_low;
+;  361		uint16_t frequency_combined;
+;  362	    uint16_t frequency_hz;
+;  363		bool enabled;
+;  364	} sn_channel_state;
+;  365	
+;  366	sn_channel_state sn_channels[6];
+;  367	uint8_t sn_vol_table[16] = {127, 113, 101, 90, 80, 71, 63, 56, 50, 45, 40, 36, 32, 28, 25, 0};
+	SEGMENT CODE
+;  368	
+;  369	void process_0x50_command(unsigned char data) {
+_process_0x50_command:
+.DEFINE "_process_0x50_command"
+
+.VALUE _process_0x50_command
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "process_0x50_command",369,"_process_0x50_command"
+
+.LINE 369
+
+.DEFINE "data"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+;  370	    //uint8_t channel = 0;
+;  371	    uint8_t type = 0;
+;  372	    uint16_t value = 0;
+;  373	
+;  374	    if (data & 0x80) { //Latch data
+.LINE 374
+
+	LD	A,(IX+%6)
+	AND	A,%80
+	JR	Z,L_73
+;  375	
+;  376	        sn.latched_channel = (data >> 5) & 0x03; // Bits 5-6 are the channel number
+.LINE 376
+
+	LD	A,(IX+%6)
+	UEXT	HL
+	LD	L,A
+	LD	A,%5
+	CALL	__ishrs_b
+	LD	A,L
+	AND	A,%3
+	LD	(_sn),A
+;  377	        sn.latched_type = (data >> 4) & 0x01; // Bit 4 is the type (1 = volume, 0 = frequency)
+.LINE 377
+
+	LD	A,(IX+%6)
+	UEXT	HL
+	LD	L,A
+	LD	A,%4
+	CALL	__ishrs_b
+	LD	A,L
+	AND	A,%1
+	LD	(_sn+1),A
+;  378	
+;  379	        if (sn.latched_type == 0) sn_channels[sn.latched_channel].frequency_low = data & 0x0F; // Bits 0-3 are the value
+.LINE 379
+
+	OR	A,A
+	JR	NZ,L_68
+	LD	A,(IX+%6)
+	AND	A,%F
+	LD	D,A
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	BC,_sn_channels
+	ADD	HL,BC
+	LD	IY,HL
+	LD	(IY+%3),D
+;  380	
+;  381	        else if (sn.latched_type == 1) sn_channels[sn.latched_channel].volume = sn_vol_table[data & 0x0F];
+.LINE 381
+
+	JR	L_75
+L_68:
+	LD	A,(_sn+1)
+	CP	A,%1
+	JR	NZ,L_75
+	LD	A,(IX+%6)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	BC,_sn_vol_table
+	ADD	HL,BC
+	LD	C,(HL)
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	DE,_sn_channels
+	ADD	HL,DE
+	LD	IY,HL
+	LD	(IY+%0),C
+	LD	(IY+%1),%0
+;  382	
+;  383	    } else { //Pure data
+.LINE 383
+
+	JR	L_75
+L_73:
+;  384	
+;  385	        if (sn.latched_type == 0) sn_channels[sn.latched_channel].frequency_high = data & 0x3F; // Bits 0-3 are the value
+.LINE 385
+
+	LD	A,(_sn+1)
+	OR	A,A
+	JR	NZ,L_71
+	LD	A,(IX+%6)
+	AND	A,%3F
+	LD	D,A
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	BC,_sn_channels
+	ADD	HL,BC
+	LD	IY,HL
+	LD	(IY+%2),D
+;  386	        else if (sn.latched_type == 1) sn_channels[sn.latched_channel].volume = sn_vol_table[data & 0x0F];
+.LINE 386
+
+	JR	L_75
+L_71:
+	LD	A,(_sn+1)
+	CP	A,%1
+	JR	NZ,L_75
+	LD	A,(IX+%6)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	BC,_sn_vol_table
+	ADD	HL,BC
+	LD	C,(HL)
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	DE,_sn_channels
+	ADD	HL,DE
+	LD	IY,HL
+	LD	(IY+%0),C
+	LD	(IY+%1),%0
+;  387	
+;  388	    }
+L_75:
+.LINE 388
+
+;  389	
+;  390	    if (sn.latched_channel == 3) return; //Ignore the noise channel
+.LINE 390
+
+	LD	A,(_sn)
+	CP	A,%3
+	JR	Z,L_84
+;  391	
+;  392	    //For an SN76489 game.vgm_info.f_scale will be MASTER_CLOCK / 32.
+;  393	
+;  394	    sn_channels[sn.latched_channel].frequency_hz = game.vgm_info.f_scale / ((sn_channels[sn.latched_channel].frequency_high << 4) | (sn_channels[sn.latched_channel].frequency_low) & 0x0F);
+.LINE 394
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFFD),BC
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	BC,_sn_channels
+	ADD	HL,BC
+	LD	IY,HL
+	LD	A,(IY+%3)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	DE,HL
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	ADD	HL,BC
+	LD	IY,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	ADD	HL,HL
+	ADD	HL,HL
+	ADD	HL,HL
+	ADD	HL,HL
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	HL,(_game+8)
+	CALL	__idivu
+	LD	BC,HL
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	DE,_sn_channels
+	ADD	HL,DE
+	LD	IY,HL
+	LD	(IY+%6),C
+	LD	(IY+%7),B
+;  395	
+;  396	    if (sn.latched_type == 0) change_frequency(sn.latched_channel, sn_channels[sn.latched_channel].frequency_hz);
+.LINE 396
+
+	LD	A,(_sn+1)
+	OR	A,A
+	JR	NZ,L_83
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	BC,_sn_channels
+	ADD	HL,BC
+	LD	IY,HL
+	LD	BC,(IY+%6)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+	JR	L_84
+;  397	
+;  398	    else if (sn.latched_type == 1) change_volume(sn.latched_channel, sn_channels[sn.latched_channel].volume * game.vgm_info.volume_multiplier);
+L_83:
+.LINE 398
+
+	LD	A,(_sn+1)
+	CP	A,%1
+	JR	NZ,L_84
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	A,(_sn)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	BC,_sn_channels
+	ADD	HL,BC
+	LD	IY,HL
+	LD	BC,(IY+%0)
+	CALL	__stoiu
+	XOR	A,A
+	LD	BC,HL
+	CALL	__ultof
+	LD	IY,(IX+%FFFFFFFD)
+	LD	HL,(IY+%19)
+	LD	E,(IY+%1C)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  399	
+;  400	}
+L_84:
+.LINE 400
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _process_0x50_command ***************************
+;Name                         Addr/Register   Size   Type
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;_game                               STATIC    105   variable
+;_sn_vol_table                       STATIC     16   variable
+;_sn_channels                        STATIC     54   variable
+;_sn                                 STATIC      2   variable
+;G_4                                   IX-3      3   variable
+;data                                  IX+6      1   parameter
+
+
+; Stack Frame Size: 12 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "process_0x50_command",400,"_process_0x50_command"
+	SEGMENT DATA
+_ay_vol_table:
+	DB	0
+	DB	8
+	DB	17
+	DB	25
+	DB	34
+	DB	42
+	DB	51
+	DB	59
+	DB	68
+	DB	76
+	DB	85
+	DB	93
+	DB	102
+	DB	110
+	DB	119
+	DB	127
+.DEFINE "ay_vol_table"
+.ALIAS "_ay_vol_table"
+.CLASS 69
+.VALUE _ay_vol_table
+.DIM 16
+.TYPE 108
+.ENDEF
+_ym_vol_table:
+	DB	0
+	DB	1
+	DB	1
+	DB	1
+	DB	2
+	DB	2
+	DB	2
+	DB	3
+	DB	4
+	DB	4
+	DB	5
+	DB	6
+	DB	7
+	DB	8
+	DB	10
+	DB	11
+	DB	13
+	DB	15
+	DB	17
+	DB	20
+	DB	23
+	DB	26
+	DB	30
+	DB	35
+	DB	39
+	DB	45
+	DB	51
+	DB	59
+	DB	67
+	DB	76
+	DB	86
+	DB	98
+.DEFINE "ym_vol_table"
+.ALIAS "_ym_vol_table"
+.CLASS 69
+.VALUE _ym_vol_table
+.DIM 32
+.TYPE 108
+.ENDEF
+;  401	
+;  402	uint8_t ay_vol_table[16] = {0, 8, 17, 25, 34, 42, 51, 59, 68, 76, 85, 93, 102, 110, 119, 127};
+;  403	uint8_t ym_vol_table[32] = {0, 1, 1, 1, 2, 2, 2, 3, 4, 4, 5, 6, 7, 8, 10, 11, 13, 15, 17, 20, 23, 26, 30, 35, 39, 45, 51, 59, 67, 76, 86, 98};
+	SEGMENT CODE
+;  404	
+;  405	UINT32 little_long(UINT8 b0, UINT8 b1, UINT8 b2, UINT8 b3) {
+_little_long:
+.DEFINE "_little_long"
+
+.VALUE _little_long
+
+.CLASS 2
+
+.TYPE 79
+
+.ENDEF
+
+.BEGFUNC "little_long",405,"_little_long"
+
+.LINE 405
+
+.DEFINE "b0"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "b1"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "b2"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "b3"
+
+.CLASS 65
+
+.VALUE 15
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "little_long"
+
+.CLASS 65
+
+.VALUE -4
+
+.TYPE 15
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	DEC	SP
+;  406	
+;  407		UINT32 little_long = 0;
+;  408			
+;  409		little_long += (UINT32)(b0 << 24);
+.LINE 409
+
+	LD	A,(IX+%6)
+	UEXT	HL
+	LD	L,A
+	LD	A,%18
+	CALL	__ishl_b
+	LD	BC,HL
+	CALL	__itol
+	LD	(IX+%FFFFFFFC),BC
+	LD	(IX+%FFFFFFFF),A
+;  410		little_long += (UINT32)(b1 << 16);
+.LINE 410
+
+	LD	A,(IX+%9)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	POP	HL
+	INC	SP
+	INC	SP
+	LD	BC,HL
+	CALL	__itol
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(IX+%FFFFFFFC)
+	LD	A,(IX+%FFFFFFFF)
+	CALL	__ladd
+	LD	(IX+%FFFFFFFC),HL
+	LD	(IX+%FFFFFFFF),E
+;  411		little_long += (UINT32)(b2 << 8);
+.LINE 411
+
+	LD	A,(IX+%C)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	BC,HL
+	CALL	__itol
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(IX+%FFFFFFFC)
+	LD	A,(IX+%FFFFFFFF)
+	CALL	__ladd
+	LD	(IX+%FFFFFFFC),HL
+	LD	(IX+%FFFFFFFF),E
+;  412		little_long += (UINT32)b3;
+.LINE 412
+
+	UEXT	HL
+	LD	L,(IX+%F)
+	LD	BC,HL
+	LD	A,H
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+	CALL	__ladd
+	LD	(IX+%FFFFFFFC),HL
+	LD	(IX+%FFFFFFFF),E
+;  413			
+;  414		return little_long;
+.LINE 414
+
+	LD	HL,(IX+%FFFFFFFC)
+	LD	E,(IX+%FFFFFFFF)
+;  415			
+;  416	}
+.LINE 416
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _little_long ***************************
+;Name                         Addr/Register   Size   Type
+;little_long                           IX-4      4   variable
+;b3                                   IX+15      1   parameter
+;b2                                   IX+12      1   parameter
+;b1                                    IX+9      1   parameter
+;b0                                    IX+6      1   parameter
+
+
+; Stack Frame Size: 22 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+.ENDFUNC "little_long",416,"_little_long"
+;  417	
+;  418	uint32_t bigtolittle32(const uint8_t *bytes) {
+_bigtolittle32:
+.DEFINE "_bigtolittle32"
+
+.VALUE _bigtolittle32
+
+.CLASS 2
+
+.TYPE 79
+
+.ENDEF
+
+.BEGFUNC "bigtolittle32",418,"_bigtolittle32"
+
+.LINE 418
+
+.DEFINE "bytes"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 204
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LEA	HL,IX+%FFFFFFF1
+	LD	SP,HL
+;  419	    return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+.LINE 419
+
+	LD	IY,(IX+%6)
+	UEXT	HL
+	LD	L,(IY+%1)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	POP	BC
+	LD	(IX+%FFFFFFFA),BC	; spill
+	POP	DE
+	INC	SP
+	INC	SP
+	UEXT	HL
+	LD	L,(IY)
+	LD	(IX+%FFFFFFF9),E	; spill
+	LD	DE,HL
+	LD	(IX+%FFFFFFF8),E	; spill
+	LD	E,(IX+%FFFFFFF9)	; unspill
+	LD	BC,0
+	LD	(IX+%FFFFFFFD),BC	; spill
+	LD	HL,(IX+%FFFFFFFA)
+	LD	BC,(IX+%FFFFFFFD)	; unspill
+	LD	(IX+%FFFFFFF9),E	; spill
+	LD	E,(IX+%FFFFFFF8)	; unspill
+	LD	A,E
+	LD	E,(IX+%FFFFFFF9)	; unspill
+	CALL	__lor
+	LD	(IX+%FFFFFFF5),HL
+	UEXT	HL
+	LD	L,(IY+%2)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	BC
+	LD	(IX+%FFFFFFF9),E	; spill
+	POP	DE
+	LD	(IX+%FFFFFFF4),E	; spill
+	LD	E,(IX+%FFFFFFF9)	; unspill
+	INC	SP
+	LD	HL,(IX+%FFFFFFF5)
+	LD	(IX+%FFFFFFF9),E	; spill
+	LD	E,(IX+%FFFFFFF4)	; unspill
+	LD	A,E
+	LD	E,(IX+%FFFFFFF9)	; unspill
+	CALL	__lor
+	LD	(IX+%FFFFFFF1),HL
+	UEXT	HL
+	LD	L,(IY+%3)
+	LD	BC,HL
+	LD	A,H
+	LD	HL,(IX+%FFFFFFF1)
+	CALL	__lor
+;  420	}
+.LINE 420
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _bigtolittle32 ***************************
+;Name                         Addr/Register   Size   Type
+;bytes                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 24 (bytes)
+;       Spill Code: -1 (instruction)
+
+
+.ENDFUNC "bigtolittle32",420,"_bigtolittle32"
+;  421	
+;  422	uint32_t littletobig32(const uint8_t *bytes) {
+_littletobig32:
+.DEFINE "_littletobig32"
+
+.VALUE _littletobig32
+
+.CLASS 2
+
+.TYPE 79
+
+.ENDEF
+
+.BEGFUNC "littletobig32",422,"_littletobig32"
+
+.LINE 422
+
+.DEFINE "bytes"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 204
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LEA	HL,IX+%FFFFFFF1
+	LD	SP,HL
+;  423	    return ((uint32_t)bytes[0]) |
+;  424	           ((uint32_t)bytes[1] << 8) |
+;  425	           ((uint32_t)bytes[2] << 16) |
+;  426	           ((uint32_t)bytes[3] << 24);
+.LINE 426
+
+	LD	IY,(IX+%6)
+	UEXT	HL
+	LD	L,(IY+%1)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	BC
+	LD	(IX+%FFFFFFFA),BC	; spill
+	POP	DE
+	INC	SP
+	UEXT	HL
+	LD	L,(IY)
+	LD	A,H
+	LD	(IX+%FFFFFFFD),HL	; spill
+	LD	HL,(IX+%FFFFFFFA)
+	LD	BC,(IX+%FFFFFFFD)	; unspill
+	CALL	__lor
+	LD	(IX+%FFFFFFF7),HL
+	UEXT	HL
+	LD	L,(IY+%2)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	POP	BC
+	LD	(IX+%FFFFFFF6),E	; spill
+	POP	DE
+	LD	(IX+%FFFFFFF5),E	; spill
+	LD	E,(IX+%FFFFFFF6)	; unspill
+	INC	SP
+	INC	SP
+	LD	HL,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFF6),E	; spill
+	LD	E,(IX+%FFFFFFF5)	; unspill
+	LD	A,E
+	LD	E,(IX+%FFFFFFF6)	; unspill
+	CALL	__lor
+	LD	(IX+%FFFFFFF2),HL
+	UEXT	HL
+	LD	L,(IY+%3)
+	LD	(IX+%FFFFFFF6),E	; spill
+	LD	DE,HL
+	LD	(IX+%FFFFFFF1),E	; spill
+	LD	E,(IX+%FFFFFFF6)	; unspill
+	LD	BC,0
+	LD	HL,(IX+%FFFFFFF2)
+	LD	(IX+%FFFFFFF6),E	; spill
+	LD	E,(IX+%FFFFFFF1)	; unspill
+	LD	A,E
+	LD	E,(IX+%FFFFFFF6)	; unspill
+	CALL	__lor
+;  427	}
+.LINE 427
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _littletobig32 ***************************
+;Name                         Addr/Register   Size   Type
+;bytes                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 24 (bytes)
+;       Spill Code: -2 (instruction)
+
+
+.ENDFUNC "littletobig32",427,"_littletobig32"
+;  428	
+;  429	uint32_t l2b(uint8_t b0, uint8_t b1, uint8_t b2, uint8_t b3) {
+_l2b:
+.DEFINE "_l2b"
+
+.VALUE _l2b
+
+.CLASS 2
+
+.TYPE 79
+
+.ENDEF
+
+.BEGFUNC "l2b",429,"_l2b"
+
+.LINE 429
+
+.DEFINE "b0"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "b1"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "b2"
+
+.CLASS 65
+
+.VALUE 12
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "b3"
+
+.CLASS 65
+
+.VALUE 15
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LEA	HL,IX+%FFFFFFEF
+	LD	SP,HL
+;  430	    return ((uint32_t)b0 << 24) |
+;  431	           ((uint32_t)b1 << 16) |
+;  432	           ((uint32_t)b2 << 8) |
+;  433	           (uint32_t)b3;
+.LINE 433
+
+	UEXT	HL
+	LD	L,(IX+%9)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	POP	BC
+	LD	(IX+%FFFFFFEF),BC	; spill
+	POP	HL
+	LD	(IX+%FFFFFFF5),L	; spill
+	INC	SP
+	INC	SP
+	UEXT	HL
+	LD	L,(IX+%6)
+	LD	DE,HL
+	LD	(IX+%FFFFFFF7),E	; spill
+	LD	BC,0
+	LD	L,(IX+%FFFFFFF5)	; unspill
+	LD	E,L
+	LD	(IX+%FFFFFFF2),BC	; spill
+	LD	HL,(IX+%FFFFFFEF)
+	LD	BC,(IX+%FFFFFFF2)	; unspill
+	LD	(IX+%FFFFFFFC),E	; spill
+	LD	E,(IX+%FFFFFFF7)	; unspill
+	LD	A,E
+	LD	E,(IX+%FFFFFFFC)	; unspill
+	CALL	__lor
+	LD	(IX+%FFFFFFF8),HL
+	UEXT	HL
+	LD	L,(IX+%C)
+	PUSH	HL
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	BC
+	LD	(IX+%FFFFFFFC),E	; spill
+	POP	DE
+	LD	(IX+%FFFFFFFB),E	; spill
+	LD	E,(IX+%FFFFFFFC)	; unspill
+	INC	SP
+	LD	HL,(IX+%FFFFFFF8)
+	LD	(IX+%FFFFFFFC),E	; spill
+	LD	E,(IX+%FFFFFFFB)	; unspill
+	LD	A,E
+	LD	E,(IX+%FFFFFFFC)	; unspill
+	CALL	__lor
+	LD	(IX+%FFFFFFFD),HL
+	UEXT	HL
+	LD	L,(IX+%F)
+	LD	BC,HL
+	LD	A,H
+	LD	HL,(IX+%FFFFFFFD)
+	CALL	__lor
+;  434	}
+.LINE 434
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _l2b ***************************
+;Name                         Addr/Register   Size   Type
+;b3                                   IX+15      1   parameter
+;b2                                   IX+12      1   parameter
+;b1                                    IX+9      1   parameter
+;b0                                    IX+6      1   parameter
+
+
+; Stack Frame Size: 35 (bytes)
+;       Spill Code: -3 (instruction)
+
+
+.ENDFUNC "l2b",434,"_l2b"
+	SEGMENT DATA
+_state:
+	DW	0
+	DB	0
+.DEFINE "state"
+.ALIAS "_state"
+.CLASS 69
+.VALUE _state
+.TYPE 4
+.ENDEF
+_start_timer0:
+	DW	0
+	DB	0
+.DEFINE "start_timer0"
+.ALIAS "_start_timer0"
+.CLASS 69
+.VALUE _start_timer0
+.TYPE 14
+.ENDEF
+_target_timer0:
+	DW	0
+	DB	0
+.DEFINE "target_timer0"
+.ALIAS "_target_timer0"
+.CLASS 69
+.VALUE _target_timer0
+.TYPE 14
+.ENDEF
+_delay_length:
+	DW	0
+	DB	0
+.DEFINE "delay_length"
+.ALIAS "_delay_length"
+.CLASS 69
+.VALUE _delay_length
+.TYPE 14
+.ENDEF
+_samples_to_wait:
+	DW	0
+	DB	0
+.DEFINE "samples_to_wait"
+.ALIAS "_samples_to_wait"
+.CLASS 69
+.VALUE _samples_to_wait
+.TYPE 14
+.ENDEF
+;  435	
+;  436	enum VgmParserState {
+;  437	    READ_COMMAND,
+;  438	    WAIT_SAMPLES,
+;  439	    WRITE_REGISTER,
+;  440	    END_OF_SOUND_DATA
+;  441	};
+;  442	
+;  443	enum VgmParserState state = READ_COMMAND;
+;  444	unsigned int start_timer0 = 0, target_timer0 = 0;
+;  445	uint24_t delay_length = 0;
+;  446	uint24_t samples_to_wait = 0;
+	SEGMENT CODE
+;  447	
+;  448	UINT8 vgm_init(UINT8 fp) {
+_vgm_init:
+.DEFINE "_vgm_init"
+
+.VALUE _vgm_init
+
+.CLASS 2
+
+.TYPE 76
+
+.ENDEF
+
+.BEGFUNC "vgm_init",448,"_vgm_init"
+
+.LINE 448
+
+.DEFINE "fp"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -13
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LEA	HL,IX+%FFFFFFC3
+	LD	SP,HL
+;  449	
+;  450	    uint8_t vgm_min_header[64];
+;  451	    uint8_t vgm_rem_header[192]; //Up to, likely less.
+;  452	    uint8_t i;
+;  453	    uint32_t test_clock = 0;
+;  454	    game.vgm_info.data_length = 0;
+.LINE 454
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFF4),BC
+	LD	(IX+%FFFFFFFD),BC
+	LD	BC,0
+	LD	(_game+18),BC
+;  455	    game.vgm_info.data_start = 0;
+.LINE 455
+
+	LD	IY,(IX+%FFFFFFFD)
+	LD	(IY+%E),BC
+;  456	
+;  457	    game.vgm_info.data_pointer = 0;
+.LINE 457
+
+	LD	(IY+%65),%0
+	LD	(IY+%66),%0
+;  458	    game.vgm_info.loop_start = 0;
+.LINE 458
+
+	LD	(IY+%A),BC
+;  459	    game.vgm_info.gd3_location = 0;
+.LINE 459
+
+	LD	(IY+%15),BC
+	LD	(IY+%18),%0
+;  460	    game.vgm_info.header_size = 0;
+.LINE 460
+
+	LD	(IY+%D),%0
+;  461	
+;  462	    game.vgm_info.pause = false;
+.LINE 462
+
+	LD	(IY+%21),%0
+;  463	
+;  464	    state = READ_COMMAND;
+.LINE 464
+
+	LD	(_state),BC
+;  465	
+;  466	    mos_fread(fp, game.vgm_info.header_data, 64);
+.LINE 466
+
+	LD	BC,64
+	PUSH	BC
+	PEA	IY+%22
+	LD	C,(IX+%6)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fread
+	POP	BC
+	POP	BC
+	POP	BC
+;  467	
+;  468	    if (game.vgm_info.header_data[0] != 'V' || game.vgm_info.header_data[1] != 'g' || game.vgm_info.header_data[2] != 'm') return 0;
+.LINE 468
+
+	LD	BC,(IX+%FFFFFFF4)
+	LD	(IX+%FFFFFFE1),BC
+	LD	IY,(IX+%FFFFFFF4)
+	LD	A,(IY+%22)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,86
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_91
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	HL,IY+%22
+	INC	HL
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,103
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_91
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	HL,IY+%24
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,109
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_93
+L_91:
+	XOR	A,A
+	JR	L_124
+L_93:
+;  469	
+;  470	    if (game.vgm_info.header_data[0x34] != 0) { //Is there more header than the classic 64 bytes?
+.LINE 470
+
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	BC,IY+%22
+	LD	(IX+%FFFFFFE4),BC
+	LD	A,(IY+%56)
+	OR	A,A
+	JR	Z,L_94
+;  471	
+;  472	        game.vgm_info.header_size = * (uint32_t * )(game.vgm_info.header_data + 0x34) - 0xC; // (less the 12 bytes between 0x34 and 0x40)
+.LINE 472
+
+	LD	BC,(IX+%FFFFFFF4)
+	LD	(IX+%FFFFFFE1),BC
+	LD	BC,(IX+%FFFFFFF4)
+	LD	(IX+%FFFFFFDB),BC
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	IY,IY+%22
+	LD	HL,(IY+%34)
+	LD	E,(IY+%37)
+	LD	BC,12
+	XOR	A,A
+	CALL	__lsub
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFF4)
+	LD	(IY+%D),C
+;  473	        mos_fread(fp, game.vgm_info.header_data + 64, game.vgm_info.header_size);
+.LINE 473
+
+	LD	IY,(IX+%FFFFFFDB)
+	LD	A,(IY+%D)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	BC,IY+%62
+	PUSH	BC
+	LD	C,(IX+%6)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fread
+	POP	BC
+	POP	BC
+	POP	BC
+;  474	
+;  475	    }
+L_94:
+.LINE 475
+
+;  476	
+;  477	    game.vgm_info.data_length = * (uint32_t * )(game.vgm_info.header_data + 0x04) - 0x04 - game.vgm_info.header_size - 0x40;
+.LINE 477
+
+	LD	BC,(IX+%FFFFFFE1)
+	LD	(IX+%FFFFFFF7),BC
+	LD	(IX+%FFFFFFE7),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFEA),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFD8),BC
+	LD	IY,(IX+%FFFFFFF7)
+	LD	HL,(IY+%26)
+	LD	E,(IY+%29)
+	LD	BC,4
+	XOR	A,A
+	CALL	__lsub
+	LD	(IX+%FFFFFFC3),HL
+	UEXT	HL
+	LD	L,(IY+%D)
+	LD	BC,HL
+	LD	A,H
+	LD	HL,(IX+%FFFFFFC3)
+	CALL	__lsub
+	LD	BC,64
+	XOR	A,A
+	CALL	__lsub
+	LD	(IY+%11),HL
+;  478	    game.vgm_info.data_start = game.vgm_info.header_size + 0x40;
+.LINE 478
+
+	LD	IY,(IX+%FFFFFFD8)
+	LD	A,(IY+%D)
+	UEXT	HL
+	LD	L,A
+	LD	IY,HL
+	LEA	BC,IY+%40
+	LD	IY,(IX+%FFFFFFD8)
+	LD	(IY+%E),BC
+;  479		
+;  480		game.vgm_info.song_data = (char*)malloc(game.vgm_info.data_length);
+.LINE 480
+
+	LD	BC,(IY+%11)
+	PUSH	BC
+	CALL	_malloc
+	POP	BC
+	LD	IY,(IX+%FFFFFFD8)
+	LD	(IY+%62),HL
+;  481	
+;  482	    if ( * (uint32_t * )(game.vgm_info.header_data + 0x0C) != 0) { //SN76489?
+.LINE 482
+
+	LD	IY,(IX+%FFFFFFF7)
+	LD	HL,(IY+%2E)
+	LD	E,(IY+%31)
+	LD	BC,0
+	XOR	A,A
+	CALL	__lcmpu
+	JR	Z,L_99
+;  483	
+;  484	        game.vgm_info.chip_type = 1;
+.LINE 484
+
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFE7),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFEA),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFD5),BC
+	LD	IY,(IX+%FFFFFFF7)
+	LD	(IY+%0),%1
+;  485	        game.vgm_info.clock = * (uint32_t * )(game.vgm_info.header_data + 0x0C);
+.LINE 485
+
+	LD	IY,(IX+%FFFFFFD5)
+	LEA	HL,IY+%2E
+	LD	BC,(HL)
+	INC	HL
+	INC	HL
+	INC	HL
+	LD	A,(HL)
+	LD	(IY+%2),BC
+	LD	(IY+%5),A
+;  486	        game.vgm_info.n_channels = 3;
+.LINE 486
+
+	LD	(IY+%6),%3
+;  487	
+;  488	    } else if ( * (uint32_t * )(game.vgm_info.header_data + 0x74) != 0) { //AY-3-8910?
+.LINE 488
+
+	JR	L_102
+L_99:
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	BC,IY+%22
+	LD	(IX+%FFFFFFE4),BC
+	LEA	IY,IY+%22
+	LD	HL,(IY+%74)
+	LD	E,(IY+%77)
+	LD	BC,0
+	XOR	A,A
+	CALL	__lcmpu
+	JR	Z,L_97
+;  489	
+;  490	        game.vgm_info.chip_type = 0;
+.LINE 490
+
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFE7),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFEA),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFD2),BC
+	LD	IY,(IX+%FFFFFFF7)
+	LD	(IY+%0),%0
+;  491	        game.vgm_info.clock = * (uint32_t * )(game.vgm_info.header_data + 0x74);
+.LINE 491
+
+	LD	IY,(IX+%FFFFFFD2)
+	LEA	IY,IY+%22
+	LEA	HL,IY+%74
+	LD	BC,(HL)
+	INC	HL
+	INC	HL
+	INC	HL
+	LD	A,(HL)
+	LD	IY,(IX+%FFFFFFD2)
+	LD	(IY+%2),BC
+	LD	(IY+%5),A
+;  492	
+;  493	        game.vgm_info.chip_variant = game.vgm_info.header_data[0x78];
+.LINE 493
+
+	LEA	IY,IY+%22
+	LD	A,(IY+%78)
+	LD	IY,(IX+%FFFFFFD2)
+	LD	(IY+%1),A
+;  494	
+;  495	        game.vgm_info.n_channels = 3;
+.LINE 495
+
+	LD	(IY+%6),%3
+;  496	
+;  497	    } else if ( * (uint32_t * )(game.vgm_info.header_data + 0x84) != 0) { //NES APU?
+.LINE 497
+
+	JR	L_102
+L_97:
+	LD	IY,(IX+%FFFFFFF4)
+	LEA	BC,IY+%22
+	LD	(IX+%FFFFFFE4),BC
+	LD	BC,132
+	LEA	DE,IY+%22
+	LD	HL,DE
+	ADD	HL,BC
+	LD	IY,HL
+	LD	HL,(IY)
+	LD	E,(IY+%3)
+	LD	BC,0
+	XOR	A,A
+	CALL	__lcmpu
+	JR	Z,L_102
+;  498	
+;  499	        game.vgm_info.chip_type = 3;
+.LINE 499
+
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFE7),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFEA),BC
+	LD	BC,(IX+%FFFFFFF7)
+	LD	(IX+%FFFFFFCF),BC
+	LD	IY,(IX+%FFFFFFF7)
+	LD	(IY+%0),%3
+;  500	        game.vgm_info.clock = * (uint32_t * )(game.vgm_info.header_data + 0x84);
+.LINE 500
+
+	LD	BC,132
+	LD	IY,(IX+%FFFFFFCF)
+	LEA	HL,IY+%22
+	ADD	HL,BC
+	LD	BC,(HL)
+	INC	HL
+	INC	HL
+	INC	HL
+	LD	A,(HL)
+	LD	(IY+%2),BC
+	LD	(IY+%5),A
+;  501	
+;  502	        game.vgm_info.n_channels = 3;
+.LINE 502
+
+	LD	(IY+%6),%3
+;  503	
+;  504	    }
+L_102:
+.LINE 504
+
+;  505	
+;  506	    if ( * (uint32_t * )(game.vgm_info.header_data + 0x1C) != 0) { //Loop detected
+.LINE 506
+
+	LD	IY,(IX+%FFFFFFE4)
+	LD	HL,(IY+%1C)
+	LD	E,(IY+%1F)
+	LD	BC,0
+	XOR	A,A
+	CALL	__lcmpu
+	JR	Z,L_101
+;  507	
+;  508	        game.vgm_info.loop_start = * (uint32_t * )(game.vgm_info.header_data + 0x1C);
+.LINE 508
+
+	LD	BC,(IX+%FFFFFFE7)
+	LD	(IX+%FFFFFFED),BC
+	LD	IY,(IX+%FFFFFFED)
+	LEA	HL,IY+%3E
+	LD	BC,(HL)
+	LD	(IY+%A),BC
+;  509	        //game.vgm_info.loop_enabled = true;
+;  510	
+;  511	    } else game.vgm_info.loop_start = 0;
+.LINE 511
+
+	JR	L_104
+L_101:
+	LD	BC,(IX+%FFFFFFEA)
+	LD	(IX+%FFFFFFED),BC
+	LD	BC,0
+	LD	IY,(IX+%FFFFFFED)
+	LD	(IY+%A),BC
+L_104:
+;  512	
+;  513	    if (game.vgm_info.header_data[0x0C] == 0x80) {
+.LINE 513
+
+	LD	BC,(IX+%FFFFFFED)
+	LD	(IX+%FFFFFFF0),BC
+	LD	(IX+%FFFFFFDE),BC
+	LD	IY,(IX+%FFFFFFF0)
+	LEA	HL,IY+%2E
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,128
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_106
+;  514	
+;  515	        printf("Detected a dual chip VGM, exiting.\r\n");
+.LINE 515
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__79
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+;  516	        return 0;
+.LINE 516
+
+	XOR	A,A
+	JR	L_124
+;  517	
+;  518	    }
+L_106:
+.LINE 518
+
+;  519	
+;  520	    if ( * (uint32_t * )(game.vgm_info.header_data + 0x14) != 0) {
+.LINE 520
+
+	LD	IY,(IX+%FFFFFFF0)
+	LD	HL,(IY+%36)
+	LD	E,(IY+%39)
+	LD	BC,0
+	XOR	A,A
+	CALL	__lcmpu
+	JR	Z,L_107
+;  521	
+;  522	        game.vgm_info.gd3_location = * (uint32_t * )(game.vgm_info.header_data + 0x14) + 0x14;
+.LINE 522
+
+	LD	BC,(IX+%FFFFFFF0)
+	LD	(IX+%FFFFFFDE),BC
+	LD	IY,(IX+%FFFFFFF0)
+	LD	HL,(IY+%36)
+	LD	E,(IY+%39)
+	LD	A,%14
+	CALL	__ladd_b
+	LD	(IY+%15),HL
+	LD	(IY+%18),E
+;  523	
+;  524	    }
+L_107:
+.LINE 524
+
+;  525	
+;  526	    mos_flseek(fp, game.vgm_info.data_start);
+.LINE 526
+
+	LD	BC,(IX+%FFFFFFDE)
+	LD	(IX+%FFFFFFFA),BC
+	LD	IY,(IX+%FFFFFFFA)
+	LD	BC,(IY+%E)
+	XOR	A,A
+	LD	DE,BC
+	LD	C,A
+	LD	B,%0
+	PUSH	BC
+	PUSH	DE
+	LD	C,(IX+%6)
+	PUSH	BC
+	CALL	_mos_flseek
+	POP	BC
+	POP	BC
+	POP	BC
+;  527	
+;  528	    game.vgm_info.data_pointer = 0;
+.LINE 528
+
+	LD	BC,(IX+%FFFFFFFA)
+	LD	(IX+%FFFFFFCC),BC
+	LD	IY,(IX+%FFFFFFFA)
+	LD	(IY+%65),%0
+	LD	(IY+%66),%0
+;  529		
+;  530		mos_fread(fp, game.vgm_info.song_data, game.vgm_info.data_length);
+.LINE 530
+
+	LD	IY,(IX+%FFFFFFCC)
+	LD	BC,(IY+%11)
+	PUSH	BC
+	LD	BC,(IY+%62)
+	PUSH	BC
+	LD	C,(IX+%6)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fread
+	POP	BC
+	POP	BC
+	POP	BC
+;  531	
+;  532	    //timer0_begin(104, 4); //44100Hz
+;  533		//timer0_begin(1044, 4); //44100 / 10 = 44100Hz
+;  534	    timer0_begin(313, 4); //4410Hz / 3 = 14700Hz
+.LINE 534
+
+	LD	BC,4
+	PUSH	BC
+	LD	BC,313
+	PUSH	BC
+	CALL	_timer0_begin
+	POP	BC
+	POP	BC
+;  535	    //timer0_begin(1567, 4); //44100Hz / 15
+;  536	    //timer0_begin(2089, 4); //44100Hz / 20
+;  537		//timer0_begin(3134, 4); //44100Hz / 30
+;  538	
+;  539	    if (game.vgm_info.chip_type == 0) { //AY
+.LINE 539
+
+	LD	IY,(IX+%FFFFFFFA)
+	LD	A,(IY+%0)
+	OR	A,A
+	JR	NZ,L_122
+;  540	
+;  541	        for (i = 0; i < game.vgm_info.n_channels; i++) {
+.LINE 541
+
+	LD	(IX+%FFFFFFF3),%0
+	JR	L_111
+L_109:
+;  542	
+;  543	            ay_states[i].volume = 0xFF;
+.LINE 543
+
+	LD	A,(IX+%FFFFFFF3)
+	UEXT	HL
+	LD	L,A
+	LD	A,%7
+	CALL	__imul_b
+	LD	BC,_ay_states
+	ADD	HL,BC
+	LD	(IX+%FFFFFFC9),HL
+	LD	A,%FF
+	LD	IY,(IX+%FFFFFFC9)
+	LD	(IY+%0),A
+;  544	            ay_states[i].frequency_coarse = 0xFF;
+.LINE 544
+
+	LD	(IY+%1),A
+;  545	            ay_states[i].frequency_fine = 0xFF;
+.LINE 545
+
+	LD	(IY+%2),%FF
+;  546	            ay_states[i].frequency_hz = 0;
+.LINE 546
+
+	LD	BC,0
+	LD	(IY+%3),BC
+;  547	            ay_states[i].enabled = 0;
+.LINE 547
+
+	LD	(IY+%6),%0
+;  548	
+;  549				//reset_channel(i);
+;  550	            play_simple(i, 0, 10, 0); //Mute
+.LINE 550
+
+	PUSH	BC
+	LD	BC,10
+	PUSH	BC
+	LD	BC,0
+	PUSH	BC
+	LD	A,(IX+%FFFFFFF3)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_play_simple
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	INC	(IX+%FFFFFFF3)
+;  551	
+;  552	        }
+L_111:
+.LINE 552
+
+	LD	A,(IX+%FFFFFFF3)
+	LD	IY,(IX+%FFFFFFFA)
+	CP	A,(IY+%6)
+	JR	C,L_109
+;  553	
+;  554	        if (game.vgm_info.chip_variant == 0x10) game.vgm_info.f_scale = game.vgm_info.clock / 32;
+.LINE 554
+
+	LD	IY,(IX+%FFFFFFFA)
+	LD	A,(IY+%1)
+	CP	A,%10
+	JR	NZ,L_113
+	LD	IY,(IX+%FFFFFFFA)
+	LD	BC,(IY+%2)
+	LD	A,(IY+%5)
+	LD	L,%5
+	CALL	__lshru
+	LD	(IY+%7),BC
+;  555	        else game.vgm_info.f_scale = game.vgm_info.clock / 16;
+.LINE 555
+
+	JR	L_123
+L_113:
+	LD	IY,(IX+%FFFFFFFA)
+	LD	BC,(IY+%2)
+	LD	A,(IY+%5)
+	LD	L,%4
+	CALL	__lshru
+	LD	(IY+%7),BC
+;  556	    } else if (game.vgm_info.chip_type == 1) { //SN
+.LINE 556
+
+	JR	L_123
+L_122:
+	LD	IY,(IX+%FFFFFFFA)
+	LD	A,(IY+%0)
+	CP	A,%1
+	JR	NZ,L_123
+;  557	
+;  558	        for (i = 0; i < game.vgm_info.n_channels; i++) {
+.LINE 558
+
+	LD	(IX+%FFFFFFF3),%0
+	JR	L_118
+L_116:
+;  559	
+;  560	            sn_channels[i].volume = 0;
+.LINE 560
+
+	LD	A,(IX+%FFFFFFF3)
+	UEXT	HL
+	LD	L,A
+	LD	A,%9
+	CALL	__imul_b
+	LD	BC,_sn_channels
+	ADD	HL,BC
+	LD	(IX+%FFFFFFC6),HL
+	LD	IY,(IX+%FFFFFFC6)
+	LD	(IY+%0),%0
+	LD	(IY+%1),%0
+;  561	            sn_channels[i].frequency_high = 0x00;
+.LINE 561
+
+	LD	(IY+%2),%0
+;  562	            sn_channels[i].frequency_low = 0x00;
+.LINE 562
+
+	LD	(IY+%3),%0
+;  563	            sn_channels[i].frequency_hz = 0;
+.LINE 563
+
+	LD	(IY+%6),%0
+	LD	(IY+%7),%0
+;  564	            sn_channels[i].enabled = 0;
+.LINE 564
+
+	LD	(IY+%8),%0
+;  565	
+;  566	            //reset_channel(i);
+;  567				play_simple(i, 0, 10, 0); //Mute
+.LINE 567
+
+	LD	BC,0
+	PUSH	BC
+	LD	BC,10
+	PUSH	BC
+	LD	BC,0
+	PUSH	BC
+	LD	A,(IX+%FFFFFFF3)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_play_simple
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	INC	(IX+%FFFFFFF3)
+;  568	
+;  569	        }
+L_118:
+.LINE 569
+
+	LD	A,(IX+%FFFFFFF3)
+	LD	IY,(IX+%FFFFFFFA)
+	CP	A,(IY+%6)
+	JR	C,L_116
+;  570	        game.vgm_info.f_scale = game.vgm_info.clock / 32;
+.LINE 570
+
+	LD	IY,(IX+%FFFFFFFA)
+	LD	BC,(IY+%2)
+	LD	A,(IY+%5)
+	LD	L,%5
+	CALL	__lshru
+	LD	(IY+%7),BC
+;  571	    }
+L_123:
+.LINE 571
+
+;  572	
+;  573	    mos_fclose(fp);
+.LINE 573
+
+	LD	C,(IX+%6)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fclose
+	POP	BC
+;  574		return 1;
+.LINE 574
+
+	LD	A,%1
+;  575	
+;  576	}
+L_124:
+.LINE 576
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _vgm_init ***************************
+;Name                         Addr/Register   Size   Type
+;_mos_fclose                         IMPORT  -----   function
+;_sn_channels                        STATIC     54   variable
+;_ay_states                          STATIC     21   variable
+;_timer0_begin                       IMPORT  -----   function
+;_mos_flseek                         IMPORT  -----   function
+;___print_sendstring                 IMPORT  -----   function
+;___print_xputch                     IMPORT      3   variable
+;___print_uputch                     IMPORT  -----   function
+;_malloc                             IMPORT  -----   function
+;_mos_fread                          IMPORT  -----   function
+;_state                              STATIC      3   variable
+;_game                               STATIC    105   variable
+;G_22                                 IX-34      3   variable
+;G_10                                 IX-31      3   variable
+;G_16                                 IX-28      3   variable
+;G_17                                 IX-25      3   variable
+;G_18                                 IX-22      3   variable
+;G_19                                 IX-19      3   variable
+;G_21                                 IX-16      3   variable
+;i                                    IX-13      1   variable
+;G_5                                  IX-12      3   variable
+;G_11                                  IX-9      3   variable
+;G_23                                  IX-6      3   variable
+;fp                                    IX+6      1   parameter
+
+
+; Stack Frame Size: 70 (bytes)
+;       Spill Code: -3 (instruction)
+
+
+.ENDFUNC "vgm_init",576,"_vgm_init"
+	SEGMENT STRSECT
+L__79:
+	DB	"Detected a dual chip VGM, exiting."
+	DB	13,10,0
+	SEGMENT CODE
+;  577	
+;  578	void vgm_loop_init() {
+_vgm_loop_init:
+.DEFINE "_vgm_loop_init"
+
+.VALUE _vgm_loop_init
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "vgm_loop_init",578,"_vgm_loop_init"
+
+.LINE 578
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	DEC	SP
+;  579	
+;  580	    uint8_t i;
+;  581	
+;  582	    timer0_end();
+.LINE 582
+
+	CALL	_timer0_end
+;  583	    timer0_begin(313, 4); //4410Hz / 3 = 14700Hz
+.LINE 583
+
+	LD	BC,4
+	PUSH	BC
+	LD	BC,313
+	PUSH	BC
+	CALL	_timer0_begin
+	POP	BC
+	POP	BC
+;  584	
+;  585	    for (i = 0; i < game.vgm_info.n_channels + 1; i++) {
+.LINE 585
+
+	LD	(IX+%FFFFFFFF),%0
+	JR	L_128
+L_126:
+;  586	
+;  587	        printf("Setting up channel %u\r\n", i);
+.LINE 587
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__87
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	A,%75
+	LD	(___print_fmt+4),A
+	LD	A,(IX+%FFFFFFFF)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	CALL	__itol
+	LD	DE,BC
+	LD	C,A
+	LD	B,%0
+	PUSH	BC
+	PUSH	DE
+	CALL	__u_uitoa
+	POP	BC
+	POP	BC
+	LD	BC,L__88
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+;  588	
+;  589	        ay_states[i].volume = 0xFF;
+.LINE 589
+
+	LD	A,(IX+%FFFFFFFF)
+	UEXT	HL
+	LD	L,A
+	LD	A,%7
+	CALL	__imul_b
+	LD	BC,_ay_states
+	ADD	HL,BC
+	LD	(IX+%FFFFFFFC),HL
+	LD	A,%FF
+	LD	IY,(IX+%FFFFFFFC)
+	LD	(IY+%0),A
+;  590	        ay_states[i].frequency_coarse = 0xFF;
+.LINE 590
+
+	LD	(IY+%1),A
+;  591	        ay_states[i].frequency_fine = 0xFF;
+.LINE 591
+
+	LD	(IY+%2),%FF
+;  592	        ay_states[i].frequency_hz = 0;
+.LINE 592
+
+	LD	BC,0
+	LD	(IY+%3),BC
+;  593	        ay_states[i].enabled = 0;
+.LINE 593
+
+	LD	(IY+%6),%0
+;  594	
+;  595	        //reset_channel(i);
+;  596			play_simple(i, 0, 10, 0); //Mute
+.LINE 596
+
+	PUSH	BC
+	LD	BC,10
+	PUSH	BC
+	LD	BC,0
+	PUSH	BC
+	LD	A,(IX+%FFFFFFFF)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_play_simple
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	INC	(IX+%FFFFFFFF)
+;  597	
+;  598	    }
+L_128:
+.LINE 598
+
+	LD	A,(_game+7)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	INC	BC
+	LD	A,(IX+%FFFFFFFF)
+	UEXT	HL
+	LD	L,A
+	OR	A,A
+	SBC	HL,BC
+	JP	M,L_126
+;  599	
+;  600	}
+.LINE 600
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _vgm_loop_init ***************************
+;Name                         Addr/Register   Size   Type
+;_game                               STATIC    105   variable
+;_ay_states                          STATIC     21   variable
+;__u_uitoa                           IMPORT  -----   function
+;___print_fmt                        IMPORT     19   variable
+;___print_sendstring                 IMPORT  -----   function
+;___print_xputch                     IMPORT      3   variable
+;___print_uputch                     IMPORT  -----   function
+;_timer0_begin                       IMPORT  -----   function
+;_timer0_end                         IMPORT  -----   function
+;i                                     IX-1      1   variable
+
+
+; Stack Frame Size: 10 (bytes)
+;       Spill Code: -3 (instruction)
+
+
+.ENDFUNC "vgm_loop_init",600,"_vgm_loop_init"
+	SEGMENT STRSECT
+L__87:
+	DB	"Setting up channel "
+	DB	0
+L__88:
+	DB	13,10,0
+	SEGMENT CODE
+;  601	
+;  602	void vgm_cleanup(UINT8 fp) {
+_vgm_cleanup:
+.DEFINE "_vgm_cleanup"
+
+.VALUE _vgm_cleanup
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "vgm_cleanup",602,"_vgm_cleanup"
+
+.LINE 602
+
+.DEFINE "fp"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	DEC	SP
+;  603	    uint8_t i;
+;  604	
+;  605		free(game.vgm_info.song_data);
+.LINE 605
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFFC),BC
+	LD	BC,(_game+99)
+	PUSH	BC
+	CALL	_free
+	POP	BC
+;  606	    mos_fclose(fp);
+.LINE 606
+
+	LD	C,(IX+%6)
+	LD	B,%0
+	PUSH	BC
+	CALL	_mos_fclose
+	POP	BC
+;  607	    for (i = 0; i < game.vgm_info.n_channels; i++) {
+.LINE 607
+
+	LD	(IX+%FFFFFFFF),%0
+	JR	L_135
+L_133:
+;  608	        play_simple(i, 0, 1, 0); //Mute
+.LINE 608
+
+	LD	BC,0
+	PUSH	BC
+	LD	BC,1
+	PUSH	BC
+	LD	BC,0
+	PUSH	BC
+	LD	A,(IX+%FFFFFFFF)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_play_simple
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+;  609			change_volume(i, 0);
+.LINE 609
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	A,(IX+%FFFFFFFF)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	INC	(IX+%FFFFFFFF)
+;  610			//reset_channel(i);
+;  611	    }
+L_135:
+.LINE 611
+
+	LD	A,(IX+%FFFFFFFF)
+	LD	IY,(IX+%FFFFFFFC)
+	CP	A,(IY+%6)
+	JR	C,L_133
+;  612	
+;  613	    start_timer0 = 0;
+.LINE 613
+
+	LD	BC,0
+	LD	(_start_timer0),BC
+;  614	    target_timer0 = 0;
+.LINE 614
+
+	LD	(_target_timer0),BC
+;  615	    delay_length = 0;
+.LINE 615
+
+	LD	(_delay_length),BC
+;  616	    samples_to_wait = 0;
+.LINE 616
+
+	LD	(_samples_to_wait),BC
+;  617	    timer0_end();
+.LINE 617
+
+	CALL	_timer0_end
+;  618	
+;  619	}
+.LINE 619
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _vgm_cleanup ***************************
+;Name                         Addr/Register   Size   Type
+;_timer0_end                         IMPORT  -----   function
+;_samples_to_wait                    STATIC      3   variable
+;_delay_length                       STATIC      3   variable
+;_target_timer0                      STATIC      3   variable
+;_start_timer0                       STATIC      3   variable
+;_putch                              IMPORT  -----   function
+;_mos_fclose                         IMPORT  -----   function
+;_free                               IMPORT  -----   function
+;_game                               STATIC    105   variable
+;G_32                                  IX-4      3   variable
+;i                                     IX-1      1   variable
+;fp                                    IX+6      1   parameter
+
+
+; Stack Frame Size: 13 (bytes)
+;       Spill Code: -3 (instruction)
+
+
+.ENDFUNC "vgm_cleanup",619,"_vgm_cleanup"
+;  620	
+;  621	/* UINT8 parse_vgm_file(UINT8 fp) {  //FILE BASED VERSION
+;  622	    unsigned char byte, firstbyte, secondbyte;
+;  623	    unsigned short reg = 0;
+;  624	    unsigned char value = 0;
+;  625		
+;  626	    //enum VgmParserState state = READ_COMMAND;
+;  627	
+;  628	    //while (state != END_OF_SOUND_DATA) {
+;  629	        switch (state) {
+;  630				printf("State: %u", state);
+;  631	            case READ_COMMAND:
+;  632					//byte = mos_fgetc(fp);
+;  633	                if (byte != EOF) {
+;  634	                    switch (byte) {
+;  635	                        case 0x61: // wait n samples
+;  636	                            firstbyte = mos_fgetc(fp);
+;  637								secondbyte = mos_fgetc(fp);
+;  638								//samples_to_wait = (mos_fgetc(fp) << 8) | mos_fgetc(fp);
+;  639								samples_to_wait = (secondbyte << 8) | firstbyte;
+;  640								start_timer0 = timer0;
+;  641	                            state = WAIT_SAMPLES;
+;  642								//printf("Delay command: %u samples (timer0=%u).\r\n", samples_to_wait, start_timer0);
+;  643								//printf("D ");
+;  644								//printf("DELAY 0x61: 0x%02X 0x%02X (%u) samples (timer0=%u).\r\n", firstbyte, secondbyte, samples_to_wait, start_timer0);
+;  645								return 0;
+;  646	                            break;
+;  647	                        case 0x62: // wait 735 samples (1/60 second)
+;  648	                            samples_to_wait = 735;
+;  649								start_timer0 = timer0;
+;  650	                            state = WAIT_SAMPLES;
+;  651								//printf("Delay command: %u samples (timer0=%u).\r\n", samples_to_wait, start_timer0);
+;  652								//printf("D ");
+;  653								//printf("DELAY 0x62: %u samples (timer0=%u).\r\n", samples_to_wait, start_timer0);
+;  654	                            return 0;
+;  655								break;
+;  656	                        case 0x63: // wait 882 samples (1/50 second)
+;  657	                            samples_to_wait = 882;
+;  658								start_timer0 = timer0;
+;  659	                            state = WAIT_SAMPLES;
+;  660								//printf("DELAY 0x63: %u samples (timer0=%u).\r\n", samples_to_wait, start_timer0);
+;  661								//printf("Delay command: %u samples (timer0=%u).\r\n", samples_to_wait, start_timer0);
+;  662								//printf("D ");
+;  663	                            return 0;
+;  664								break;
+;  665	                        case 0x70: // delay n+1 samples
+;  666	                        case 0x71:
+;  667	                        case 0x72:
+;  668	                        case 0x73:
+;  669	                        case 0x74:
+;  670	                        case 0x75:
+;  671	                        case 0x76:
+;  672	                        case 0x77:
+;  673	                        case 0x78:
+;  674	                        case 0x79:
+;  675	                        case 0x7A:
+;  676	                        case 0x7B:
+;  677	                        case 0x7C:
+;  678	                        case 0x7D:
+;  679	                        case 0x7E:
+;  680	                        case 0x7F:
+;  681	                            samples_to_wait = (byte & 0x0F) + 1;
+;  682								start_timer0 = timer0;
+;  683	                            state = WAIT_SAMPLES;
+;  684								//printf("DELAY 0x7n: %u samples (timer0=%u).\r\n", samples_to_wait, start_timer0);
+;  685								//printf("D ");
+;  686	                            return 0;
+;  687								break;
+;  688	                        case 0x50:
+;  689								value = mos_fgetc(fp);
+;  690								//process_0x50_command(value);
+;  691								return 0;
+;  692							case 0xA0: // write to registry
+;  693	                            //reg = fread(&byte, 1, fp);
+;  694								reg = mos_fgetc(fp);
+;  695	                            value = mos_fgetc(fp);
+;  696	                            //ay_write_register(reg, value);
+;  697								//printf("WRITE: %u value %u.\r\n", reg, value);
+;  698								//printf("W ");
+;  699								//updateAY38910(reg, value);
+;  700								process_0xA0_command(reg,value);
+;  701	                            return 0;
+;  702								break;
+;  703	                        case 0x66: // end of sound data
+;  704	                            state = END_OF_SOUND_DATA;
+;  705	                            printf("\r\nEND OF DATA\r\n");
+;  706								// if (vgm_info.loop_start) {
+;  707									// 
+;  708									// state = READ_COMMAND;
+;  709									// vgm_cleanup(fp);
+;  710									// vgm_loop_init(fp);
+;  711									// 
+;  712									// 
+;  713								// } else return 1;
+;  714						
+;  715								return 1;
+;  716	                        default:
+;  717	                            // unsupported command, ignore and continue
+;  718	                            return 0;
+;  719								break;
+;  720	                    }
+;  721	                }
+;  722	                break;
+;  723	            case WAIT_SAMPLES:
+;  724					target_timer0 = start_timer0 + samples_to_wait;    
+;  725					if (timer0 >= target_timer0) {
+;  726	                    state = READ_COMMAND;
+;  727	                    samples_to_wait = 0;
+;  728	                }
+;  729	                return 0;
+;  730					break;
+;  731	            default:
+;  732	                // invalid state, exit loop
+;  733	                state = END_OF_SOUND_DATA;
+;  734	                return 1;
+;  735	        }
+;  736		//}
+;  737	} */
+;  738	
+;  739	UINT8 parse_vgm_file() {
+_parse_vgm_file:
+.DEFINE "_parse_vgm_file"
+
+.VALUE _parse_vgm_file
+
+.CLASS 2
+
+.TYPE 76
+
+.ENDEF
+
+.BEGFUNC "parse_vgm_file",739,"_parse_vgm_file"
+
+.LINE 739
+
+.DEFINE "value"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "byte"
+
+.CLASS 65
+
+.VALUE -2
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "firstbyte"
+
+.CLASS 65
+
+.VALUE -3
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "secondbyte"
+
+.CLASS 65
+
+.VALUE -7
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LEA	HL,IX+%FFFFFF98
+	LD	SP,HL
+;  740	    uint8_t byte, firstbyte, secondbyte;
+;  741	    uint8_t reg = 0;
+;  742	    uint8_t value = 0;
+;  743	
+;  744	    //printf("%u\r\n", fo->fptr);
+;  745	    if (game.vgm_file == NULL) return 1;
+.LINE 745
+
+	LD	A,(_game)
+	OR	A,A
+	JR	NZ,L_270
+	LD	A,%1
+	JR	L_272
+L_270:
+;  746		
+;  747		switch (state) {
+.LINE 747
+
+	LD	BC,(_state)
+L__95:
+	LD	HL,1
+	OR	A,A
+	SBC	HL,BC
+	JR	C,L_269
+	LD	HL,BC
+	LD	BC,HL
+	ADD	HL,HL
+	ADD	HL,BC
+	LD	BC,L__94
+	ADD	HL,BC
+	LD	HL,(HL)
+	JP	(HL)
+L__94:
+	DW24	L_142	
+
+	DW24	L_139	
+
+;  748	
+;  749	    case WAIT_SAMPLES:
+L_139:
+.LINE 749
+
+;  750	        //target_timer0 = start_timer0 + samples_to_wait;		
+;  751	        if (timer0 >= target_timer0) {
+.LINE 751
+
+	LD	BC,(_target_timer0)
+	LD	HL,(_timer0)
+	OR	A,A
+	SBC	HL,BC
+	JR	C,L_141
+;  752	            state = READ_COMMAND;
+.LINE 752
+
+	LD	BC,0
+	LD	(_state),BC
+;  753	            samples_to_wait = 0;
+.LINE 753
+
+	LD	(_samples_to_wait),BC
+;  754	        }
+L_141:
+.LINE 754
+
+;  755	        return 0;
+.LINE 755
+
+	XOR	A,A
+	JR	L_272
+;  756	
+;  757	    case READ_COMMAND:
+L_142:
+.LINE 757
+
+;  758	        //byte = mos_fgetc(fp);
+;  759			byte = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 759
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFDB),BC
+	LD	IY,(IX+%FFFFFFDB)
+	LD	BC,(IY+%65)
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(IX+%FFFFFFFE),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  760	        if (byte != EOF) {
+.LINE 760
+
+	LD	A,(IX+%FFFFFFFE)
+	UEXT	HL
+	LD	L,A
+	LD	BC,16777215
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_268
+;  761	            switch (byte) {
+.LINE 761
+
+	LD	A,(IX+%FFFFFFFE)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+L__100:
+	LD	DE,97
+	OR	A,A
+	SBC	HL,DE
+	JR	C,L__101
+	LD	HL,127
+	OR	A,A
+	SBC	HL,BC
+	JR	C,L__103
+	LD	HL,BC
+	LD	DE,HL
+	ADD	HL,HL
+	ADD	HL,DE
+	LD	DE,L__99-291
+	ADD	HL,DE
+	LD	HL,(HL)
+	JP	(HL)
+L__99:
+	DW24	L_144	
+
+	DW24	L_147	
+
+	DW24	L_148	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_261	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_266	
+
+	DW24	L_149	
+
+	DW24	L_150	
+
+	DW24	L_151	
+
+	DW24	L_152	
+
+	DW24	L_153	
+
+	DW24	L_154	
+
+	DW24	L_155	
+
+	DW24	L_156	
+
+	DW24	L_157	
+
+	DW24	L_158	
+
+	DW24	L_159	
+
+	DW24	L_160	
+
+	DW24	L_161	
+
+	DW24	L_162	
+
+	DW24	L_163	
+
+	DW24	L_164	
+
+L__101:
+	LD	DE,80
+	LD	HL,BC
+	OR	A,A
+	SBC	HL,DE
+	JR	Z,L_165
+	JR	L_266
+L__103:
+	LD	DE,160
+	LD	HL,BC
+	OR	A,A
+	SBC	HL,DE
+	JR	Z,L_167
+	JR	L_266
+;  762	            case 0x61: // wait n samples
+L_144:
+.LINE 762
+
+;  763	                //firstbyte = mos_fgetc(fp);
+;  764					firstbyte = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 764
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFD8),BC
+	LD	IY,(IX+%FFFFFFD8)
+	LD	BC,(IY+%65)
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(IX+%FFFFFFFD),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  765	                //secondbyte = mos_fgetc(fp);
+;  766					secondbyte = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 766
+
+	LD	DE,(IY+%65)
+	LD	BC,DE
+	CALL	__stoiu
+	LD	(IX+%FFFFFF9C),BC	; spill
+	LD	BC,(IY+%62)
+	LD	(IX+%FFFFFF99),BC	; spill
+	LD	BC,(IX+%FFFFFF9C)	; unspill
+	LD	(IX+%FFFFFF9C),BC	; spill
+	LD	BC,(IX+%FFFFFF99)	; unspill
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(IX+%FFFFFFF9),A
+	LD	BC,DE
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  767	                target_timer0 = timer0 + (secondbyte << 8) | firstbyte;
+.LINE 767
+
+	LD	A,(IX+%FFFFFFF9)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	BC,(_timer0)
+	ADD	HL,BC
+	LD	DE,HL
+	LD	A,(IX+%FFFFFFFD)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	LD	HL,DE
+	CALL	__ior
+	LD	(_target_timer0),HL
+;  768	                //samples_to_wait = (secondbyte << 8) | firstbyte;
+;  769	                //start_timer0 = timer0;
+;  770	                state = WAIT_SAMPLES;
+.LINE 770
+
+	LD	BC,1
+	LD	(_state),BC
+;  771	                return 0;
+.LINE 771
+
+	XOR	A,A
+	JR	L_272
+;  772	            case 0x62: // wait 735 samples (1/60 second)
+L_147:
+.LINE 772
+
+;  773	                target_timer0 = timer0 + 735;
+.LINE 773
+
+	LD	BC,735
+	LD	HL,(_timer0)
+	ADD	HL,BC
+	LD	(_target_timer0),HL
+;  774	                state = WAIT_SAMPLES;
+.LINE 774
+
+	LD	BC,1
+	LD	(_state),BC
+;  775	                return 0;
+.LINE 775
+
+	XOR	A,A
+	JR	L_272
+;  776	            case 0x63: // wait 882 samples (1/50 second)
+L_148:
+.LINE 776
+
+;  777	                target_timer0 = timer0 + 882;
+.LINE 777
+
+	LD	BC,882
+	LD	HL,(_timer0)
+	ADD	HL,BC
+	LD	(_target_timer0),HL
+;  778	                state = WAIT_SAMPLES;
+.LINE 778
+
+	LD	BC,1
+	LD	(_state),BC
+;  779	                return 0;
+.LINE 779
+
+	XOR	A,A
+	JR	L_272
+;  780	            case 0x70: // delay n+1 samples
+L_149:
+.LINE 780
+
+;  781	            case 0x71:
+L_150:
+.LINE 781
+
+;  782	            case 0x72:
+L_151:
+.LINE 782
+
+;  783	            case 0x73:
+L_152:
+.LINE 783
+
+;  784	            case 0x74:
+L_153:
+.LINE 784
+
+;  785	            case 0x75:
+L_154:
+.LINE 785
+
+;  786	            case 0x76:
+L_155:
+.LINE 786
+
+;  787	            case 0x77:
+L_156:
+.LINE 787
+
+;  788	            case 0x78:
+L_157:
+.LINE 788
+
+;  789	            case 0x79:
+L_158:
+.LINE 789
+
+;  790	            case 0x7A:
+L_159:
+.LINE 790
+
+;  791	            case 0x7B:
+L_160:
+.LINE 791
+
+;  792	            case 0x7C:
+L_161:
+.LINE 792
+
+;  793	            case 0x7D:
+L_162:
+.LINE 793
+
+;  794	            case 0x7E:
+L_163:
+.LINE 794
+
+;  795	            case 0x7F:
+L_164:
+.LINE 795
+
+;  796	                target_timer0 = timer0 + (byte & 0x0F) + 1;
+.LINE 796
+
+	LD	A,(IX+%FFFFFFFE)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	BC,(_timer0)
+	ADD	HL,BC
+	LD	BC,HL
+	INC	HL
+	LD	(_target_timer0),HL
+;  797	                state = WAIT_SAMPLES;
+.LINE 797
+
+	LD	BC,1
+	LD	(_state),BC
+;  798	                return 0;
+.LINE 798
+
+	XOR	A,A
+	JR	L_272
+;  799	            // case 0xB4:
+;  800	                // reg = mos_fgetc(fp);
+;  801					// value = mos_fgetc(fp);
+;  802	                // process_0xB4_command(reg, value);
+;  803	                // return 0;            
+;  804				case 0x50:
+L_165:
+.LINE 804
+
+;  805	                //value = mos_fgetc(fp);
+;  806					value = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 806
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFD5),BC
+	LD	IY,(IX+%FFFFFFD5)
+	LD	BC,(IY+%65)
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(IX+%FFFFFFFF),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  807	                process_0x50_command(value);
+.LINE 807
+
+	LD	C,(IX+%FFFFFFFF)
+	LD	B,%0
+	PUSH	BC
+	CALL	_process_0x50_command
+	POP	BC
+;  808	                return 0;
+.LINE 808
+
+	XOR	A,A
+	JR	L_272
+;  809	            case 0xA0: // AY_3_8910 command
+L_167:
+.LINE 809
+
+;  810	                //process_0xA0_command(mos_fgetc(fp),mos_fgetc(fp));
+;  811	                //switch (mos_fgetc(fp)) {
+;  812					switch (game.vgm_info.song_data[game.vgm_info.data_pointer++]) {
+.LINE 812
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFD2),BC
+	LD	IY,(IX+%FFFFFFD2)
+	LD	DE,(IY+%65)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+	LD	BC,DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,HL
+L__106:
+	LD	HL,10
+	OR	A,A
+	SBC	HL,BC
+	JR	C,L_259
+	LD	HL,BC
+	LD	BC,HL
+	ADD	HL,HL
+	ADD	HL,BC
+	LD	BC,L__105
+	ADD	HL,BC
+	LD	HL,(HL)
+	JP	(HL)
+L__105:
+	DW24	L_170	
+
+	DW24	L_176	
+
+	DW24	L_200	
+
+	DW24	L_206	
+
+	DW24	L_212	
+
+	DW24	L_218	
+
+	DW24	L_169	
+
+	DW24	L_224	
+
+	DW24	L_182	
+
+	DW24	L_188	
+
+	DW24	L_194	
+
+;  813	                case 0x06:
+L_169:
+.LINE 813
+
+;  814	                    return 0; //We're not doing noises.
+.LINE 814
+
+	XOR	A,A
+	JR	L_272
+;  815	                case 0x00:
+L_170:
+.LINE 815
+
+;  816	                    //ay_states[0].frequency_fine = mos_fgetc(fp);
+;  817						ay_states[0].frequency_fine = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 817
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFCC),BC
+	LD	IY,(IX+%FFFFFFCC)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states
+	LD	(IX+%FFFFFFDE),DE
+	LD	(IX+%FFFFFFCF),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(_ay_states+2),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  818	                    ay_states[0].frequency_hz = game.vgm_info.f_scale / (ay_states[0].frequency_coarse << 8 | ay_states[0].frequency_fine);
+.LINE 818
+
+	LD	IY,(IX+%FFFFFFCF)
+	LD	A,(IY+%1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	DE,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFCC)
+	LD	HL,(IY+%7)
+	CALL	__idivu
+	LD	IY,(IX+%FFFFFFCF)
+	LD	(IY+%3),HL
+;  819	                    if (ay_states[0].enabled) change_frequency(0, ay_states[0].frequency_hz);
+.LINE 819
+
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_175
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,(IX+%FFFFFFDE)
+	LD	BC,(IY+%3)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+L_175:
+;  820	                    return 0;
+.LINE 820
+
+	XOR	A,A
+	JR	L_272
+;  821	                case 0x01:
+L_176:
+.LINE 821
+
+;  822	                    ay_states[0].frequency_coarse = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 822
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFC6),BC
+	LD	IY,(IX+%FFFFFFC6)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states
+	LD	(IX+%FFFFFFE4),DE
+	LD	(IX+%FFFFFFC9),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(_ay_states+1),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  823	                    ay_states[0].frequency_hz = game.vgm_info.f_scale / (ay_states[0].frequency_coarse << 8 | ay_states[0].frequency_fine);
+.LINE 823
+
+	LD	IY,(IX+%FFFFFFC9)
+	LD	A,(IY+%1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	DE,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFC6)
+	LD	HL,(IY+%7)
+	CALL	__idivu
+	LD	IY,(IX+%FFFFFFC9)
+	LD	(IY+%3),HL
+;  824	                    if (ay_states[0].enabled) change_frequency(0, ay_states[0].frequency_hz);
+.LINE 824
+
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_181
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,(IX+%FFFFFFE4)
+	LD	BC,(IY+%3)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+L_181:
+;  825	                    return 0;
+.LINE 825
+
+	XOR	A,A
+	JR	L_272
+;  826	                case 0x08:
+L_182:
+.LINE 826
+
+;  827	                    ay_states[0].volume = ay_vol_table[(game.vgm_info.song_data[game.vgm_info.data_pointer++] & 0x0F)];
+.LINE 827
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFC3),BC
+	LD	IY,(IX+%FFFFFFC3)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states
+	LD	(IX+%FFFFFFE1),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	BC,_ay_vol_table
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(_ay_states),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  828	                    if (ay_states[0].enabled) change_volume(0, ay_states[0].volume * game.vgm_info.volume_multiplier);
+.LINE 828
+
+	LD	A,(_ay_states+6)
+	OR	A,A
+	JR	Z,L_187
+	LD	BC,23
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	UEXT	HL
+	LD	IY,(IX+%FFFFFFE1)
+	LD	L,(IY+%0)
+	LD	A,H
+	LD	BC,HL
+	CALL	__ultof
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(_game+26)
+	LD	A,(_game+29)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+L_187:
+;  829	                    return 0;
+.LINE 829
+
+	XOR	A,A
+	JR	L_272
+;  830	                case 0x09:
+L_188:
+.LINE 830
+
+;  831	                    ay_states[1].volume = ay_vol_table[(game.vgm_info.song_data[game.vgm_info.data_pointer++] & 0x0F)];
+.LINE 831
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFC0),BC
+	LD	IY,(IX+%FFFFFFC0)
+	LD	BC,(IY+%65)
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	BC,_ay_vol_table
+	ADD	HL,BC
+	LD	IY,_ay_states
+	LD	A,(HL)
+	LD	(IY+%7),A
+	LD	IY,(IX+%FFFFFFC0)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  832	                    if (ay_states[1].enabled) change_volume(1, ay_states[1].volume * game.vgm_info.volume_multiplier);
+.LINE 832
+
+	LD	IY,_ay_states
+	LD	A,(IY+%D)
+	OR	A,A
+	JR	Z,L_193
+	LD	BC,23
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,1
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	IY,_ay_states
+	UEXT	HL
+	LD	L,(IY+%7)
+	LD	A,H
+	LD	BC,HL
+	CALL	__ultof
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(_game+26)
+	LD	A,(_game+29)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+L_193:
+;  833	                    return 0;
+.LINE 833
+
+	XOR	A,A
+	JR	L_272
+;  834	                case 0x0A:
+L_194:
+.LINE 834
+
+;  835	                    ay_states[2].volume = ay_vol_table[(game.vgm_info.song_data[game.vgm_info.data_pointer++] & 0x0F)];
+.LINE 835
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFBD),BC
+	LD	IY,(IX+%FFFFFFBD)
+	LD	BC,(IY+%65)
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	AND	A,%F
+	UEXT	HL
+	LD	L,A
+	LD	BC,_ay_vol_table
+	ADD	HL,BC
+	LD	IY,_ay_states
+	LD	A,(HL)
+	LD	(IY+%E),A
+	LD	IY,(IX+%FFFFFFBD)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  836	                    if (ay_states[2].enabled) change_volume(2, ay_states[2].volume * game.vgm_info.volume_multiplier);
+.LINE 836
+
+	LD	IY,_ay_states
+	LD	A,(IY+%14)
+	OR	A,A
+	JR	Z,L_199
+	LD	BC,23
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	LD	(IX+%FFFFFF98),A
+	CALL	_putch
+	LD	A,(IX+%FFFFFF98)
+	POP	BC
+	LD	IY,_ay_states
+	UEXT	HL
+	LD	L,(IY+%E)
+	LD	A,H
+	LD	BC,HL
+	CALL	__ultof
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(_game+26)
+	LD	A,(_game+29)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+L_199:
+;  837	                    return 0;
+.LINE 837
+
+	XOR	A,A
+	JR	L_272
+;  838	                case 0x02:
+L_200:
+.LINE 838
+
+;  839	                    ay_states[1].frequency_fine = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 839
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFB7),BC
+	LD	IY,(IX+%FFFFFFB7)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states+7
+	LD	(IX+%FFFFFFBA),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	IY,_ay_states
+	LD	A,(HL)
+	LD	(IY+%9),A
+	LD	IY,(IX+%FFFFFFB7)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  840	                    ay_states[1].frequency_hz = game.vgm_info.f_scale / (ay_states[1].frequency_coarse << 8 | ay_states[1].frequency_fine);
+.LINE 840
+
+	LD	IY,(IX+%FFFFFFBA)
+	LD	A,(IY+%1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	DE,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFB7)
+	LD	HL,(IY+%7)
+	CALL	__idivu
+	LD	IY,(IX+%FFFFFFBA)
+	LD	(IY+%3),HL
+;  841	                    if (ay_states[1].enabled) change_frequency(1, ay_states[1].frequency_hz);
+.LINE 841
+
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_205
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,1
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,_ay_states
+	LD	BC,(IY+%A)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+L_205:
+;  842	                    return 0;
+.LINE 842
+
+	XOR	A,A
+	JR	L_272
+;  843	                case 0x03:
+L_206:
+.LINE 843
+
+;  844	                    ay_states[1].frequency_coarse = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 844
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFB1),BC
+	LD	IY,(IX+%FFFFFFB1)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states+7
+	LD	(IX+%FFFFFFB4),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	IY,_ay_states
+	LD	A,(HL)
+	LD	(IY+%8),A
+	LD	IY,(IX+%FFFFFFB1)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  845	                    ay_states[1].frequency_hz = game.vgm_info.f_scale / (ay_states[1].frequency_coarse << 8 | ay_states[1].frequency_fine);
+.LINE 845
+
+	LD	IY,(IX+%FFFFFFB4)
+	LD	A,(IY+%1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	DE,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFB1)
+	LD	HL,(IY+%7)
+	CALL	__idivu
+	LD	IY,(IX+%FFFFFFB4)
+	LD	(IY+%3),HL
+;  846	                    if (ay_states[1].enabled) change_frequency(1, ay_states[1].frequency_hz);
+.LINE 846
+
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_211
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,1
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,_ay_states
+	LD	BC,(IY+%A)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+L_211:
+;  847	                    return 0;
+.LINE 847
+
+	XOR	A,A
+	JR	L_272
+;  848	                case 0x04:
+L_212:
+.LINE 848
+
+;  849	                    ay_states[2].frequency_fine = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 849
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFAB),BC
+	LD	IY,(IX+%FFFFFFAB)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states+14
+	LD	(IX+%FFFFFFAE),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	IY,_ay_states
+	LD	A,(HL)
+	LD	(IY+%10),A
+	LD	IY,(IX+%FFFFFFAB)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  850	                    ay_states[2].frequency_hz = game.vgm_info.f_scale / (ay_states[2].frequency_coarse << 8 | ay_states[2].frequency_fine);
+.LINE 850
+
+	LD	IY,(IX+%FFFFFFAE)
+	LD	A,(IY+%1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	DE,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFAB)
+	LD	HL,(IY+%7)
+	CALL	__idivu
+	LD	IY,(IX+%FFFFFFAE)
+	LD	(IY+%3),HL
+;  851	                    if (ay_states[2].enabled) change_frequency(2, ay_states[2].frequency_hz);
+.LINE 851
+
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_217
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,_ay_states
+	LD	BC,(IY+%11)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+L_217:
+;  852	                    return 0;
+.LINE 852
+
+	XOR	A,A
+	JR	L_272
+;  853	                case 0x05:
+L_218:
+.LINE 853
+
+;  854	                    ay_states[2].frequency_coarse = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 854
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFA5),BC
+	LD	IY,(IX+%FFFFFFA5)
+	LD	BC,(IY+%65)
+	LD	DE,_ay_states+14
+	LD	(IX+%FFFFFFA8),DE
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	IY,_ay_states
+	LD	A,(HL)
+	LD	(IY+%F),A
+	LD	IY,(IX+%FFFFFFA5)
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  855	                    ay_states[2].frequency_hz = game.vgm_info.f_scale / (ay_states[2].frequency_coarse << 8 | ay_states[2].frequency_fine);
+.LINE 855
+
+	LD	IY,(IX+%FFFFFFA8)
+	LD	A,(IY+%1)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	UEXT	HL
+	PUSH	HL
+	INC	SP
+	INC	SP
+	POP	HL
+	INC	SP
+	LD	DE,HL
+	LD	A,(IY+%2)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,DE
+	CALL	__ior
+	LD	BC,HL
+	LD	IY,(IX+%FFFFFFA5)
+	LD	HL,(IY+%7)
+	CALL	__idivu
+	LD	IY,(IX+%FFFFFFA8)
+	LD	(IY+%3),HL
+;  856	                    if (ay_states[2].enabled) change_frequency(2, ay_states[2].frequency_hz);
+.LINE 856
+
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_223
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,3
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,_ay_states
+	LD	BC,(IY+%11)
+	PUSH	BC
+	CALL	_write16bit
+	POP	BC
+L_223:
+;  857	                    return 0;
+.LINE 857
+
+	XOR	A,A
+	JR	L_272
+;  858	                case 0x07:
+L_224:
+.LINE 858
+
+;  859	                    value = game.vgm_info.song_data[game.vgm_info.data_pointer++];
+.LINE 859
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFA2),BC
+	LD	IY,(IX+%FFFFFFA2)
+	LD	BC,(IY+%65)
+	CALL	__stoiu
+	LD	BC,(IY+%62)
+	ADD	HL,BC
+	LD	A,(HL)
+	LD	(IX+%FFFFFFFF),A
+	LD	BC,(IY+%65)
+	INC	BC
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  860	                    ay_states[0].enabled = !(value & 0x01);
+.LINE 860
+
+	LD	A,(IX+%FFFFFFFF)
+	AND	A,%1
+	JR	NZ,L_227
+	LD	BC,1
+	LD	(IX+%FFFFFFED),BC
+	JR	L_228
+L_227:
+	LD	BC,0
+	LD	(IX+%FFFFFFED),BC
+L_228:
+	LD	A,(IX+%FFFFFFED)
+	LD	(_ay_states+6),A
+;  861	                    ay_states[1].enabled = !(value & 0x02);
+.LINE 861
+
+	LD	A,(IX+%FFFFFFFF)
+	AND	A,%2
+	JR	NZ,L_231
+	LD	BC,1
+	LD	(IX+%FFFFFFEA),BC
+	JR	L_232
+L_231:
+	LD	BC,0
+	LD	(IX+%FFFFFFEA),BC
+L_232:
+	LD	A,(IX+%FFFFFFEA)
+	LD	IY,_ay_states
+	LD	(IY+%D),A
+;  862	                    ay_states[2].enabled = !(value & 0x04);
+.LINE 862
+
+	LD	A,(IX+%FFFFFFFF)
+	AND	A,%4
+	JR	NZ,L_235
+	LD	BC,1
+	LD	(IX+%FFFFFFE7),BC
+	JR	L_236
+L_235:
+	LD	BC,0
+	LD	(IX+%FFFFFFE7),BC
+L_236:
+	LEA	BC,IY+%E
+	LD	(IX+%FFFFFFFA),BC
+	LD	A,(IX+%FFFFFFE7)
+	LD	(IY+%14),A
+;  863	
+;  864	                    change_volume(0, !!ay_states[0].enabled * ay_states[0].volume * game.vgm_info.volume_multiplier);
+.LINE 864
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	A,(_ay_states+6)
+	OR	A,A
+	JR	Z,L_239
+	LD	BC,1
+	LD	(IX+%FFFFFFF6),BC
+	JR	L_240
+L_239:
+	LD	BC,0
+	LD	(IX+%FFFFFFF6),BC
+L_240:
+	LD	A,(_ay_states)
+	UEXT	HL
+	LD	L,A
+	LD	BC,(IX+%FFFFFFF6)
+	CALL	__imuls
+	LD	BC,HL
+	CALL	__itol
+	CALL	__ltof
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(_game+26)
+	LD	A,(_game+29)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  865	                    change_volume(1, !!ay_states[1].enabled * ay_states[1].volume * game.vgm_info.volume_multiplier);
+.LINE 865
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,1
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,_ay_states
+	LD	A,(IY+%D)
+	OR	A,A
+	JR	Z,L_245
+	LD	BC,1
+	LD	(IX+%FFFFFFF3),BC
+	JR	L_246
+L_245:
+	LD	BC,0
+	LD	(IX+%FFFFFFF3),BC
+L_246:
+	LD	A,(IY+%7)
+	UEXT	HL
+	LD	L,A
+	LD	BC,(IX+%FFFFFFF3)
+	CALL	__imuls
+	LD	BC,HL
+	CALL	__itol
+	CALL	__ltof
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(_game+26)
+	LD	A,(_game+29)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  866	                    change_volume(2, !!ay_states[2].enabled * ay_states[2].volume * game.vgm_info.volume_multiplier);
+.LINE 866
+
+	LD	BC,23
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,0
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,133
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	BC,2
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+	LD	IY,(IX+%FFFFFFFA)
+	LD	A,(IY+%6)
+	OR	A,A
+	JR	Z,L_252
+	LD	BC,1
+	LD	(IX+%FFFFFFF0),BC
+	JR	L_253
+L_252:
+	LD	BC,0
+	LD	(IX+%FFFFFFF0),BC
+L_253:
+	LD	IY,(IX+%FFFFFFFA)
+	LD	A,(IY+%0)
+	UEXT	HL
+	LD	L,A
+	LD	BC,(IX+%FFFFFFF0)
+	CALL	__imuls
+	LD	BC,HL
+	CALL	__itol
+	CALL	__ltof
+	LD	E,A
+	LD	HL,BC
+	LD	BC,(_game+26)
+	LD	A,(_game+29)
+	CALL	__fmul
+	CALL	__ftol
+	PUSH	BC
+	CALL	_putch
+	POP	BC
+;  867	                    return 0;
+.LINE 867
+
+	XOR	A,A
+	JR	L_272
+;  868	
+;  869	                default:
+L_259:
+.LINE 869
+
+;  870	                    // Invalid register, ignore
+;  871	                    return 0;
+.LINE 871
+
+	XOR	A,A
+	JR	L_272
+;  872	                }
+;  873	                return 0;
+;  874	            case 0x66: // end of sound data
+L_261:
+.LINE 874
+
+;  875	                state = END_OF_SOUND_DATA;
+.LINE 875
+
+	LD	BC,3
+	LD	(_state),BC
+;  876	
+;  877	                if (game.vgm_info.loop_start && game.vgm_info.loop_enabled) {
+.LINE 877
+
+	LD	BC,0
+	LD	HL,(_game+11)
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_264
+	LD	A,(_game+21)
+	OR	A,A
+	JR	Z,L_264
+;  878	
+;  879	                    //mos_flseek(fp, game.vgm_info.loop_start);
+;  880	                    game.vgm_info.data_pointer = game.vgm_info.loop_start;
+.LINE 880
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFF9F),BC
+	LD	IY,(IX+%FFFFFF9F)
+	LD	BC,(IY+%A)
+	LD	(IY+%65),C
+	LD	(IY+%66),B
+;  881						timer0_end();
+.LINE 881
+
+	CALL	_timer0_end
+;  882						timer0_begin(313, 4); //4410Hz / 3 = 14700Hz
+.LINE 882
+
+	LD	BC,4
+	PUSH	BC
+	LD	BC,313
+	PUSH	BC
+	CALL	_timer0_begin
+	POP	BC
+	POP	BC
+;  883	                    state = READ_COMMAND;
+.LINE 883
+
+	LD	BC,0
+	LD	(_state),BC
+;  884	                    return 0;
+.LINE 884
+
+	XOR	A,A
+	JR	L_272
+;  885	
+;  886	                } else vgm_cleanup(game.vgm_file);
+L_264:
+.LINE 886
+
+	LD	A,(_game)
+	LD	C,A
+	LD	B,%0
+	PUSH	BC
+	CALL	_vgm_cleanup
+	POP	BC
+;  887	
+;  888	                return 1;
+.LINE 888
+
+	LD	A,%1
+	JR	L_272
+;  889	            default:
+L_266:
+.LINE 889
+
+;  890	                // unsupported command, ignore and continue
+;  891	                return 0;
+.LINE 891
+
+	XOR	A,A
+	JR	L_272
+;  892	                break;
+;  893	            }
+;  894	        }
+L_268:
+.LINE 894
+
+;  895	        return 0;
+.LINE 895
+
+	XOR	A,A
+	JR	L_272
+;  896	    default:
+L_269:
+.LINE 896
+
+;  897	        // invalid state, exit loop
+;  898	        state = END_OF_SOUND_DATA;
+.LINE 898
+
+	LD	BC,3
+	LD	(_state),BC
+;  899	        return 1;
+.LINE 899
+
+	LD	A,%1
+;  900	    }
+;  901	    return 0;
+;  902	}
+L_272:
+.LINE 902
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _parse_vgm_file ***************************
+;Name                         Addr/Register   Size   Type
+;_timer0_begin                       IMPORT  -----   function
+;_timer0_end                         IMPORT  -----   function
+;_ay_vol_table                       STATIC     16   variable
+;_write16bit                         IMPORT  -----   function
+;_putch                              IMPORT  -----   function
+;_ay_states                          STATIC     21   variable
+;_samples_to_wait                    STATIC      3   variable
+;_target_timer0                      STATIC      3   variable
+;_timer0                             IMPORT      3   variable
+;_state                              STATIC      3   variable
+;_game                               STATIC    105   variable
+;G_37                                 IX-34      3   variable
+;G_42                                 IX-31      3   variable
+;G_39                                 IX-28      3   variable
+;temp237                              IX-25      3   variable
+;temp233                              IX-22      3   variable
+;temp229                              IX-19      3   variable
+;temp254                              IX-16      3   variable
+;temp247                              IX-13      3   variable
+;temp241                              IX-10      3   variable
+;secondbyte                            IX-7      1   variable
+;G_62                                  IX-6      3   variable
+;firstbyte                             IX-3      1   variable
+;byte                                  IX-2      1   variable
+;value                                 IX-1      1   variable
+
+
+; Stack Frame Size: 110 (bytes)
+;       Spill Code: -4 (instruction)
+
+
+.ENDFUNC "parse_vgm_file",902,"_parse_vgm_file"
+;  903	
+;  904	int main(int argc, char * argv[]) {
+_main:
+.DEFINE "_main"
+
+.VALUE _main
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "main",904,"_main"
+
+.LINE 904
+
+.DEFINE "argc"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "argv"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 290
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	PUSH	BC
+;  905		
+;  906		int i = 0, j = 0;
+;  907		UINT24 t = 0;
+;  908		uint8_t key = 0, keycount;
+;  909		FIL *fo;
+;  910		
+;  911	// 	if (argc < 2) {
+;  912			
+;  913		//	printf("Usage: play [song.vgm]");
+;  914			//return 0;
+;  915			
+;  916		//}
+;  917			
+;  918		game.vgm_info.loop_enabled = false;
+.LINE 918
+
+	LD	BC,_game+1
+	LD	(IX+%FFFFFFFD),BC
+	LD	(IX+%FFFFFFFA),BC
+	XOR	A,A
+	LD	(_game+21),A
+;  919		//for (i = 0; i < argc; i++) printf("- argv[%d]: %s\n\r", i, argv[i]);
+;  920		if (!strcmp(argv[2], "loop=true")) game.vgm_info.loop_enabled = true;
+.LINE 920
+
+	LD	BC,L__126
+	PUSH	BC
+	LD	IY,(IX+%9)
+	LEA	HL,IY+%6
+	LD	BC,(HL)
+	PUSH	BC
+	CALL	_strcmp
+	POP	BC
+	POP	BC
+	LD	BC,0
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_274
+	LD	IY,(IX+%FFFFFFFD)
+	LD	(IY+%14),%1
+;  921		else game.vgm_info.loop_enabled = false;
+.LINE 921
+
+	JR	L_275
+L_274:
+	LD	IY,(IX+%FFFFFFFA)
+	LD	(IY+%14),%0
+L_275:
+;  922		
+;  923		game.vgm_file = mos_fopen(argv[1], fa_read);
+.LINE 923
+
+	LD	BC,1
+	PUSH	BC
+	LD	IY,(IX+%9)
+	LEA	HL,IY+%3
+	LD	BC,(HL)
+	PUSH	BC
+	CALL	_mos_fopen
+	POP	BC
+	POP	BC
+	LD	(_game),A
+;  924	    if (!game.vgm_file) { printf("Error: could not open file %s.\r\n", argv[1]); return 0; }
+.LINE 924
+
+	OR	A,A
+	JR	NZ,L_278
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__129
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	IY,(IX+%9)
+	LEA	HL,IY+%3
+	LD	BC,(HL)
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	BC,L__130
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	OR	A,A
+	SBC	HL,HL
+	JR	L_283
+L_278:
+;  925		
+;  926		if (vgm_init(game.vgm_file) == 0) return 0;
+.LINE 926
+
+	LD	A,(_game)
+	LD	C,A
+	LD	B,%0
+	PUSH	BC
+	CALL	_vgm_init
+	POP	BC
+	OR	A,A
+	JR	NZ,L_279
+	OR	A,A
+	SBC	HL,HL
+	JR	L_283
+L_279:
+;  927		
+;  928		game.vgm_info.volume_multiplier = 0.2;
+.LINE 928
+
+	LD	BC,5033165
+	LD	A,%3E
+	LD	(_game+26),BC
+	LD	(_game+29),A
+;  929		//printf("Size = %u", fo->obj.objsize);
+;  930		
+;  931		while (parse_vgm_file() != 1);
+L_281:
+.LINE 931
+
+	CALL	_parse_vgm_file
+	UEXT	HL
+	LD	L,A
+	LD	BC,1
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_281
+;  932		
+;  933		vgm_cleanup(game.vgm_file); 
+.LINE 933
+
+	LD	A,(_game)
+	LD	C,A
+	LD	B,%0
+	PUSH	BC
+	CALL	_vgm_cleanup
+	POP	BC
+;  934	
+;  935		return 0;
+.LINE 935
+
+	OR	A,A
+	SBC	HL,HL
+;  936		
+;  937	}
+L_283:
+.LINE 937
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _main ***************************
+;Name                         Addr/Register   Size   Type
+;___print_sendstring                 IMPORT  -----   function
+;___print_xputch                     IMPORT      3   variable
+;___print_uputch                     IMPORT  -----   function
+;_mos_fopen                          IMPORT  -----   function
+;_strcmp                             IMPORT  -----   function
+;_game                               STATIC    105   variable
+;G_69                                  IX-6      3   variable
+;G_68                                  IX-3      3   variable
+;argv                                  IX+9      3   parameter
+;argc                                  IX+6      3   parameter
+
+
+; Stack Frame Size: 18 (bytes)
+;       Spill Code: -4 (instruction)
+
+
+.ENDFUNC "main",937,"_main"
+	SEGMENT STRSECT
+L__126:
+	DB	"loop=true"
+	DB	0
+L__129:
+	DB	"Error: could not open file "
+	DB	0
+L__130:
+	DB	"."
+	DB	13,10,0
+	XREF _write32bit:ROM
+	XREF _write16bit:ROM
+	XREF _timer0_end:ROM
+	XREF _timer0_begin:ROM
+	XREF _timer0:ROM
+	XREF _mos_flseek:ROM
+	XREF _mos_fread:ROM
+	XREF _mos_feof:ROM
+	XREF _mos_fgetc:ROM
+	XREF _mos_fclose:ROM
+	XREF _mos_fopen:ROM
+	XREF _getsysvar_audioSuccess:ROM
+	XREF _mos_puts:ROM
+	XREF _waitvblank:ROM
+	XREF _putch:ROM
+	XREF _strcmp:ROM
+	XREF _malloc:ROM
+	XREF _free:ROM
+	XREF __u_uitoa:ROM
+	XREF ___print_sendstring:ROM
+	XREF ___print_xputch:ROM
+	XREF ___print_uputch:ROM
+	XREF ___print_fmt:ROM
+	XREF __lcmpu:ROM
+	XREF __ladd:ROM
+	XREF __lsub:ROM
+	XREF __imuls:ROM
+	XREF __idivu:ROM
+	XREF __ior:ROM
+	XREF __lor:ROM
+	XREF __smulu:ROM
+	XREF __lshru:ROM
+	XREF __ishl:ROM
+	XREF __fmul:ROM
+	XREF __ftol:ROM
+	XREF __ltof:ROM
+	XREF __ultof:ROM
+	XREF __stoiu:ROM
+	XREF __itol:ROM
+	XREF __ildix:ROM
+	XREF __istix:ROM
+	XREF __imul_b:ROM
+	XREF __ladd_b:ROM
+	XREF __ishl_b:ROM
+	XREF __ishrs_b:ROM
+	XDEF _main
+	XDEF _parse_vgm_file
+	XDEF _vgm_cleanup
+	XDEF _vgm_loop_init
+	XDEF _vgm_init
+	XDEF _samples_to_wait
+	XDEF _delay_length
+	XDEF _target_timer0
+	XDEF _start_timer0
+	XDEF _state
+	XDEF _l2b
+	XDEF _littletobig32
+	XDEF _bigtolittle32
+	XDEF _little_long
+	XDEF _ym_vol_table
+	XDEF _ay_vol_table
+	XDEF _process_0x50_command
+	XDEF _sn_vol_table
+	XDEF _sn_channels
+	XDEF _sn
+	XDEF _ay_states
+	XDEF _load_wav
+	XDEF _play_sample
+	XDEF _play_advanced_keep
+	XDEF _play_advanced
+	XDEF _play_saw_force
+	XDEF _play_simple_force
+	XDEF _reset_channel
+	XDEF _play_simple
+	XDEF _channel_ready
+	XDEF _isKthBitSet
+	XDEF _delay_secs
+	XDEF _delay_cents
+	XDEF _delay_ticks
+	XDEF _game
+	END
