@@ -901,23 +901,47 @@ UINT8 parse_vgm_file() {
     return 0;
 }
 
+uint8_t strtou8(const char *str) {
+    uint8_t result = 0;
+    const uint8_t maxDiv10 = 255 / 10;
+    const uint8_t maxMod10 = 255 % 10;
+
+    // Skip leading white spaces
+    while (*str == ' ' || *str == '\t' || *str == '\n') {
+        str++;
+    }
+
+    // Convert digits
+    while (*str >= '0' && *str <= '9') {
+        uint8_t digit = *str - '0';
+        if (result > maxDiv10 || (result == maxDiv10 && digit > maxMod10)) {
+            return 255;
+        }
+        result = result * 10 + digit;
+        str++;
+    }
+
+    return result;
+}
+
+
 int main(int argc, char * argv[]) {
 	
 	int i = 0, j = 0;
 	UINT24 t = 0;
-	uint8_t key = 0, keycount;
+	uint8_t key = 0, keycount, pressed;
 	FIL *fo;
 	
-// 	if (argc < 2) {
-		
-	//	printf("Usage: play [song.vgm]");
-		//return 0;
-		
-	//}
+	if (argc < 2) {
+		// 
+		printf("Usage: %s <filename> [volume 0-100] [loop=true]\r\n", argv[0]);
+		return 0;
+		// 
+	}
 		
 	game.vgm_info.loop_enabled = false;
 	//for (i = 0; i < argc; i++) printf("- argv[%d]: %s\n\r", i, argv[i]);
-	if (!strcmp(argv[2], "loop=true")) game.vgm_info.loop_enabled = true;
+	if (!strcmp(argv[3], "loop=true")) game.vgm_info.loop_enabled = true;
 	else game.vgm_info.loop_enabled = false;
 	
 	game.vgm_file = mos_fopen(argv[1], fa_read);
@@ -925,10 +949,18 @@ int main(int argc, char * argv[]) {
 	
 	if (vgm_init(game.vgm_file) == 0) return 0;
 	
-	game.vgm_info.volume_multiplier = 0.2;
-	//printf("Size = %u", fo->obj.objsize);
+	if (argc == 3 || argc == 4) game.vgm_info.volume_multiplier = (float)strtou8(argv[2]) / 100;
+	else game.vgm_info.volume_multiplier = (float)0.3;
 	
-	while (parse_vgm_file() != 1);
+	keycount = getsysvar_vkeycount();
+	
+	while (parse_vgm_file() != 1) { //Start playing back the VGM file, stop when something changes (either end of song with no loop scheduled or an error).	
+		key = getsysvar_keyascii();
+		pressed = getsysvar_vkeydown();
+		if (getsysvar_vkeycount() != keycount && ((key == 27) || (key == 'q')) && pressed == 0) break;
+		keycount = getsysvar_vkeycount();
+		
+	}
 	
 	vgm_cleanup(game.vgm_file); 
 

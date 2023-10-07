@@ -7403,7 +7403,216 @@ L_272:
 
 .ENDFUNC "parse_vgm_file",902,"_parse_vgm_file"
 ;  903	
-;  904	int main(int argc, char * argv[]) {
+;  904	uint8_t strtou8(const char *str) {
+_strtou8:
+.DEFINE "_strtou8"
+
+.VALUE _strtou8
+
+.CLASS 2
+
+.TYPE 76
+
+.ENDEF
+
+.BEGFUNC "strtou8",904,"_strtou8"
+
+.LINE 904
+
+.DEFINE "str"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 194
+
+.ENDEF
+
+.DEFINE "result"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "digit"
+
+.CLASS 65
+
+.VALUE -2
+
+.TYPE 12
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	DEC	SP
+	DEC	SP
+;  905	    uint8_t result = 0;
+.LINE 905
+
+	LD	(IX+%FFFFFFFF),%0
+;  906	    const uint8_t maxDiv10 = 255 / 10;
+;  907	    const uint8_t maxMod10 = 255 % 10;
+;  908	
+;  909	    // Skip leading white spaces
+;  910	    while (*str == ' ' || *str == '\t' || *str == '\n') {
+.LINE 910
+
+	JR	L_276
+L_277:
+;  911	        str++;
+.LINE 911
+
+	LD	BC,(IX+%6)
+	INC	BC
+	LD	(IX+%6),BC
+;  912	    }
+L_276:
+.LINE 912
+
+	LD	HL,(IX+%6)
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,32
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_277
+	LD	HL,(IX+%6)
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,9
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_277
+	LD	HL,(IX+%6)
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,10
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_277
+;  913	
+;  914	    // Convert digits
+;  915	    while (*str >= '0' && *str <= '9') {
+.LINE 915
+
+	JR	L_284
+L_285:
+;  916	        uint8_t digit = *str - '0';
+.LINE 916
+
+	LD	HL,(IX+%6)
+	LD	A,(HL)
+	SUB	A,%30
+	LD	(IX+%FFFFFFFE),A
+;  917	        if (result > maxDiv10 || (result == maxDiv10 && digit > maxMod10)) {
+.LINE 917
+
+	LD	A,%19
+	CP	A,(IX+%FFFFFFFF)
+	JR	C,L_281
+	LD	A,(IX+%FFFFFFFF)
+	CP	A,%19
+	JR	NZ,L_282
+	LD	A,%5
+	CP	A,(IX+%FFFFFFFE)
+	JR	NC,L_282
+L_281:
+;  918	            return 255;
+.LINE 918
+
+	LD	A,%FF
+	JR	L_288
+;  919	        }
+L_282:
+.LINE 919
+
+;  920	        result = result * 10 + digit;
+.LINE 920
+
+	LD	B,%A
+	LD	C,(IX+%FFFFFFFF)
+	MLT	BC
+	LD	A,C
+	ADD	A,(IX+%FFFFFFFE)
+	LD	(IX+%FFFFFFFF),A
+;  921	        str++;
+.LINE 921
+
+	LD	BC,(IX+%6)
+	INC	BC
+	LD	(IX+%6),BC
+;  922	    }
+L_284:
+.LINE 922
+
+	LD	HL,(IX+%6)
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,48
+	OR	A,A
+	SBC	HL,BC
+	JP	M,L_287
+	LD	HL,(IX+%6)
+	LD	A,(HL)
+	LD	B,A
+	SEXT	HL
+	LD	L,B
+	LD	BC,HL
+	LD	HL,57
+	OR	A,A
+	SBC	HL,BC
+	JP	P,L__134
+	JP	PE,L_285
+	JR	L__135
+L__134:
+	JP	PO,L_285
+L__135:
+L_287:
+;  923	
+;  924	    return result;
+.LINE 924
+
+	LD	A,(IX+%FFFFFFFF)
+;  925	}
+L_288:
+.LINE 925
+
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _strtou8 ***************************
+;Name                         Addr/Register   Size   Type
+;digit                                 IX-2      1   variable
+;result                                IX-1      1   variable
+;str                                   IX+6      3   parameter
+
+
+; Stack Frame Size: 11 (bytes)
+;       Spill Code: -4 (instruction)
+
+
+.ENDFUNC "strtou8",925,"_strtou8"
+;  926	
+;  927	
+;  928	int main(int argc, char * argv[]) {
 _main:
 .DEFINE "_main"
 
@@ -7415,9 +7624,9 @@ _main:
 
 .ENDEF
 
-.BEGFUNC "main",904,"_main"
+.BEGFUNC "main",928,"_main"
 
-.LINE 904
+.LINE 928
 
 .DEFINE "argc"
 
@@ -7439,40 +7648,111 @@ _main:
 
 .ENDEF
 
+.DEFINE "key"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "keycount"
+
+.CLASS 65
+
+.VALUE -2
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "pressed"
+
+.CLASS 65
+
+.VALUE -3
+
+.TYPE 12
+
+.ENDEF
+
 	PUSH	IX
 	LD	IX,0
 	ADD	IX,SP
 	PUSH	BC
 	PUSH	BC
-;  905		
-;  906		int i = 0, j = 0;
-;  907		UINT24 t = 0;
-;  908		uint8_t key = 0, keycount;
-;  909		FIL *fo;
-;  910		
-;  911	// 	if (argc < 2) {
-;  912			
-;  913		//	printf("Usage: play [song.vgm]");
-;  914			//return 0;
-;  915			
-;  916		//}
-;  917			
-;  918		game.vgm_info.loop_enabled = false;
-.LINE 918
+	PUSH	BC
+;  929		
+;  930		int i = 0, j = 0;
+;  931		UINT24 t = 0;
+;  932		uint8_t key = 0, keycount, pressed;
+.LINE 932
+
+	LD	(IX+%FFFFFFFF),%0
+;  933		FIL *fo;
+;  934		
+;  935		if (argc < 2) {
+.LINE 935
+
+	LD	BC,2
+	LD	HL,(IX+%6)
+	OR	A,A
+	SBC	HL,BC
+	JP	P,L__153
+	JP	PE,L_290
+	JR	L__154
+L__153:
+	JP	PO,L_290
+L__154:
+;  936			// 
+;  937			printf("Usage: %s <filename> [volume 0-100] [loop=true]\r\n", argv[0]);
+.LINE 937
+
+	LD	BC,___print_uputch
+	LD	(___print_xputch),BC
+	LD	BC,L__138
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	HL,(IX+%9)
+	LD	BC,(HL)
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+	LD	BC,L__139
+	PUSH	BC
+	CALL	___print_sendstring
+	POP	BC
+;  938			return 0;
+.LINE 938
+
+	OR	A,A
+	SBC	HL,HL
+	JR	L_310
+;  939			// 
+;  940		}
+L_290:
+.LINE 940
+
+;  941			
+;  942		game.vgm_info.loop_enabled = false;
+.LINE 942
 
 	LD	BC,_game+1
-	LD	(IX+%FFFFFFFD),BC
+	LD	(IX+%FFFFFFF7),BC
 	LD	(IX+%FFFFFFFA),BC
 	XOR	A,A
 	LD	(_game+21),A
-;  919		//for (i = 0; i < argc; i++) printf("- argv[%d]: %s\n\r", i, argv[i]);
-;  920		if (!strcmp(argv[2], "loop=true")) game.vgm_info.loop_enabled = true;
-.LINE 920
+;  943		//for (i = 0; i < argc; i++) printf("- argv[%d]: %s\n\r", i, argv[i]);
+;  944		if (!strcmp(argv[3], "loop=true")) game.vgm_info.loop_enabled = true;
+.LINE 944
 
-	LD	BC,L__126
+	LD	BC,L__140
 	PUSH	BC
 	LD	IY,(IX+%9)
-	LEA	HL,IY+%6
+	LEA	HL,IY+%9
 	LD	BC,(HL)
 	PUSH	BC
 	CALL	_strcmp
@@ -7481,20 +7761,20 @@ _main:
 	LD	BC,0
 	OR	A,A
 	SBC	HL,BC
-	JR	NZ,L_274
-	LD	IY,(IX+%FFFFFFFD)
+	JR	NZ,L_292
+	LD	IY,(IX+%FFFFFFF7)
 	LD	(IY+%14),%1
-;  921		else game.vgm_info.loop_enabled = false;
-.LINE 921
+;  945		else game.vgm_info.loop_enabled = false;
+.LINE 945
 
-	JR	L_275
-L_274:
+	JR	L_293
+L_292:
 	LD	IY,(IX+%FFFFFFFA)
 	LD	(IY+%14),%0
-L_275:
-;  922		
-;  923		game.vgm_file = mos_fopen(argv[1], fa_read);
-.LINE 923
+L_293:
+;  946		
+;  947		game.vgm_file = mos_fopen(argv[1], fa_read);
+.LINE 947
 
 	LD	BC,1
 	PUSH	BC
@@ -7506,14 +7786,14 @@ L_275:
 	POP	BC
 	POP	BC
 	LD	(_game),A
-;  924	    if (!game.vgm_file) { printf("Error: could not open file %s.\r\n", argv[1]); return 0; }
-.LINE 924
+;  948	    if (!game.vgm_file) { printf("Error: could not open file %s.\r\n", argv[1]); return 0; }
+.LINE 948
 
 	OR	A,A
-	JR	NZ,L_278
+	JR	NZ,L_296
 	LD	BC,___print_uputch
 	LD	(___print_xputch),BC
-	LD	BC,L__129
+	LD	BC,L__143
 	PUSH	BC
 	CALL	___print_sendstring
 	POP	BC
@@ -7523,17 +7803,17 @@ L_275:
 	PUSH	BC
 	CALL	___print_sendstring
 	POP	BC
-	LD	BC,L__130
+	LD	BC,L__144
 	PUSH	BC
 	CALL	___print_sendstring
 	POP	BC
 	OR	A,A
 	SBC	HL,HL
-	JR	L_283
-L_278:
-;  925		
-;  926		if (vgm_init(game.vgm_file) == 0) return 0;
-.LINE 926
+	JR	L_310
+L_296:
+;  949		
+;  950		if (vgm_init(game.vgm_file) == 0) return 0;
+.LINE 950
 
 	LD	A,(_game)
 	LD	C,A
@@ -7542,24 +7822,102 @@ L_278:
 	CALL	_vgm_init
 	POP	BC
 	OR	A,A
-	JR	NZ,L_279
+	JR	NZ,L_300
 	OR	A,A
 	SBC	HL,HL
-	JR	L_283
-L_279:
-;  927		
-;  928		game.vgm_info.volume_multiplier = 0.2;
-.LINE 928
+	JR	L_310
+L_300:
+;  951		
+;  952		if (argc == 3 || argc == 4) game.vgm_info.volume_multiplier = (float)strtou8(argv[2]) / 100;
+.LINE 952
 
-	LD	BC,5033165
+	LD	BC,3
+	LD	HL,(IX+%6)
+	OR	A,A
+	SBC	HL,BC
+	JR	Z,L_298
+	LD	BC,4
+	LD	HL,(IX+%6)
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_299
+L_298:
+	LD	IY,(IX+%9)
+	LEA	HL,IY+%6
+	LD	BC,(HL)
+	PUSH	BC
+	CALL	_strtou8
+	POP	BC
+	UEXT	HL
+	LD	L,A
+	LD	A,H
+	LD	BC,HL
+	CALL	__ultof
+	LD	HL,13107200
+	LD	E,%42
+	CALL	__fdiv
+	LD	(_game+26),BC
+	LD	(_game+29),A
+;  953		else game.vgm_info.volume_multiplier = (float)0.3;
+.LINE 953
+
+	JR	L_301
+L_299:
+	LD	BC,10066330
 	LD	A,%3E
 	LD	(_game+26),BC
 	LD	(_game+29),A
-;  929		//printf("Size = %u", fo->obj.objsize);
-;  930		
-;  931		while (parse_vgm_file() != 1);
-L_281:
-.LINE 931
+L_301:
+;  954		
+;  955		keycount = getsysvar_vkeycount();
+.LINE 955
+
+	CALL	_getsysvar_vkeycount
+	LD	(IX+%FFFFFFFE),A
+;  956		
+;  957		while (parse_vgm_file() != 1) { //Start playing back the VGM file, stop when something changes (either end of song with no loop scheduled or an error).	
+.LINE 957
+
+	JR	L_307
+L_308:
+;  958			key = getsysvar_keyascii();
+.LINE 958
+
+	CALL	_getsysvar_keyascii
+	LD	(IX+%FFFFFFFF),A
+;  959			pressed = getsysvar_vkeydown();
+.LINE 959
+
+	CALL	_getsysvar_vkeydown
+	LD	(IX+%FFFFFFFD),A
+;  960			if (getsysvar_vkeycount() != keycount && ((key == 27) || (key == 'q')) && pressed == 0) break;
+.LINE 960
+
+	CALL	_getsysvar_vkeycount
+	LD	B,A
+	LD	A,(IX+%FFFFFFFE)
+	CP	A,B
+	JR	Z,L_306
+	LD	A,(IX+%FFFFFFFF)
+	CP	A,%1B
+	JR	Z,L_304
+	LD	A,(IX+%FFFFFFFF)
+	CP	A,%71
+	JR	NZ,L_306
+L_304:
+	LD	A,(IX+%FFFFFFFD)
+	OR	A,A
+	JR	Z,L_309
+L_306:
+;  961			keycount = getsysvar_vkeycount();
+.LINE 961
+
+	CALL	_getsysvar_vkeycount
+	LD	(IX+%FFFFFFFE),A
+;  962			
+;  963		}
+L_307:
+.LINE 963
 
 	CALL	_parse_vgm_file
 	UEXT	HL
@@ -7567,10 +7925,11 @@ L_281:
 	LD	BC,1
 	OR	A,A
 	SBC	HL,BC
-	JR	NZ,L_281
-;  932		
-;  933		vgm_cleanup(game.vgm_file); 
-.LINE 933
+	JR	NZ,L_308
+L_309:
+;  964		
+;  965		vgm_cleanup(game.vgm_file); 
+.LINE 965
 
 	LD	A,(_game)
 	LD	C,A
@@ -7578,16 +7937,16 @@ L_281:
 	PUSH	BC
 	CALL	_vgm_cleanup
 	POP	BC
-;  934	
-;  935		return 0;
-.LINE 935
+;  966	
+;  967		return 0;
+.LINE 967
 
 	OR	A,A
 	SBC	HL,HL
-;  936		
-;  937	}
-L_283:
-.LINE 937
+;  968		
+;  969	}
+L_310:
+.LINE 969
 
 	LD	SP,IX
 	POP	IX
@@ -7596,31 +7955,43 @@ L_283:
 
 ;**************************** _main ***************************
 ;Name                         Addr/Register   Size   Type
-;___print_sendstring                 IMPORT  -----   function
-;___print_xputch                     IMPORT      3   variable
-;___print_uputch                     IMPORT  -----   function
+;_getsysvar_vkeydown                 IMPORT  -----   function
+;_getsysvar_keyascii                 IMPORT  -----   function
+;_getsysvar_vkeycount                IMPORT  -----   function
 ;_mos_fopen                          IMPORT  -----   function
 ;_strcmp                             IMPORT  -----   function
 ;_game                               STATIC    105   variable
+;___print_sendstring                 IMPORT  -----   function
+;___print_xputch                     IMPORT      3   variable
+;___print_uputch                     IMPORT  -----   function
+;G_68                                  IX-9      3   variable
 ;G_69                                  IX-6      3   variable
-;G_68                                  IX-3      3   variable
+;pressed                               IX-3      1   variable
+;keycount                              IX-2      1   variable
+;key                                   IX-1      1   variable
 ;argv                                  IX+9      3   parameter
 ;argc                                  IX+6      3   parameter
 
 
-; Stack Frame Size: 18 (bytes)
+; Stack Frame Size: 21 (bytes)
 ;       Spill Code: -4 (instruction)
 
 
-.ENDFUNC "main",937,"_main"
+.ENDFUNC "main",969,"_main"
 	SEGMENT STRSECT
-L__126:
+L__138:
+	DB	"Usage: "
+	DB	0
+L__139:
+	DB	" <filename> [volume 0-100] [loop=true]"
+	DB	13,10,0
+L__140:
 	DB	"loop=true"
 	DB	0
-L__129:
+L__143:
 	DB	"Error: could not open file "
 	DB	0
-L__130:
+L__144:
 	DB	"."
 	DB	13,10,0
 	XREF _write32bit:ROM
@@ -7634,7 +8005,10 @@ L__130:
 	XREF _mos_fgetc:ROM
 	XREF _mos_fclose:ROM
 	XREF _mos_fopen:ROM
+	XREF _getsysvar_vkeycount:ROM
+	XREF _getsysvar_vkeydown:ROM
 	XREF _getsysvar_audioSuccess:ROM
+	XREF _getsysvar_keyascii:ROM
 	XREF _mos_puts:ROM
 	XREF _waitvblank:ROM
 	XREF _putch:ROM
@@ -7657,6 +8031,7 @@ L__130:
 	XREF __lshru:ROM
 	XREF __ishl:ROM
 	XREF __fmul:ROM
+	XREF __fdiv:ROM
 	XREF __ftol:ROM
 	XREF __ltof:ROM
 	XREF __ultof:ROM
@@ -7669,6 +8044,7 @@ L__130:
 	XREF __ishl_b:ROM
 	XREF __ishrs_b:ROM
 	XDEF _main
+	XDEF _strtou8
 	XDEF _parse_vgm_file
 	XDEF _vgm_cleanup
 	XDEF _vgm_loop_init
